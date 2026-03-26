@@ -184,7 +184,13 @@ public class ItemDetailsController implements AuctionObserver {
             if (resultMsg.equals("SUCCESS")) {
                 updateCurrentBidDisplay();
                 bidAmountField.clear();
-                showAlert(Alert.AlertType.INFORMATION, "Thành công", "Bạn đã vươn lên dẫn đầu với mức giá $" + bidAmount + "!");
+                if (isAutoMode) {
+                    showAlert(Alert.AlertType.INFORMATION, "Ủy quyền thành công",
+                            "Hệ thống đã nhận Max Bid $" + bidAmount + ". Chúng tôi sẽ tự động đấu giá thay bạn!");
+                } else {
+                    showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                            "Bạn đã vươn lên dẫn đầu với mức giá $" + bidAmount + "!");
+                }
             } else {
                 showAlert(Alert.AlertType.WARNING, "Không hợp lệ", resultMsg);
             }
@@ -195,21 +201,24 @@ public class ItemDetailsController implements AuctionObserver {
 
     @FXML
     protected void handleIncreaseBid() {
-        switchToManualMode();
         try {
             double currentVal = Double.parseDouble(bidAmountField.getText());
             bidAmountField.setText(String.format("%.0f", currentVal + currentItem.getBidIncrement()));
         } catch (Exception e) {
-            bidAmountField.setText(String.format("%.0f", currentItem.getCurrentHighestBid() + currentItem.getBidIncrement()));
+            double minAllowed = currentItem.getCurrentWinnerId().equals("NONE")
+                    ? currentItem.getStartingPrice()
+                    : currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
+            bidAmountField.setText(String.format("%.0f", minAllowed));
         }
     }
 
     @FXML
     protected void handleDecreaseBid() {
-        switchToManualMode();
         try {
             double currentVal = Double.parseDouble(bidAmountField.getText());
-            double minAllowed = currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
+            double minAllowed = currentItem.getCurrentWinnerId().equals("NONE")
+                    ? currentItem.getStartingPrice()
+                    : currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
             if (currentVal - currentItem.getBidIncrement() >= minAllowed) {
                 bidAmountField.setText(String.format("%.0f", currentVal - currentItem.getBidIncrement()));
             }

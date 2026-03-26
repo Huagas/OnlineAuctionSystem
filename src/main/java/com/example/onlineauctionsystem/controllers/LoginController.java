@@ -32,7 +32,6 @@ public class LoginController {
         }
 
         messageLabel.setText("");
-        // Gọi Service kiểm tra đăng nhập
         User loggedInUser = UserService.login(username, password);
 
         if (loggedInUser != null) {

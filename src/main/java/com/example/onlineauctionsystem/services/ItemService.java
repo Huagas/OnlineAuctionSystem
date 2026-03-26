@@ -188,6 +188,7 @@ public class ItemService {
             if (item.getStatus().equals("Đã kết thúc")) {
                 item.setPaymentStatus(newStatus);
                 saveItemsToFile();
+                notifyObservers();
                 return true;
             }
         }
@@ -198,9 +199,18 @@ public class ItemService {
         Item item = getItemById(itemId);
         if (item == null) return "Tài sản không tồn tại!";
 
+        double minRequired = item.getCurrentWinnerId().equals("NONE")
+                ? item.getStartingPrice()
+                : item.getCurrentHighestBid() + item.getBidIncrement();
+
+        if (maxBidAmount < minRequired) {
+            return "Mức giá tối đa không được thấp hơn mức giá tối thiểu yêu cầu ($" + minRequired + ")!";
+        }
+
         item.getAutoBids().add(new AutoBid(userId, maxBidAmount));
         processAutoBiddingWar(item);
         saveItemsToFile();
+        notifyObservers();
         return "SUCCESS";
     }
 
@@ -226,7 +236,7 @@ public class ItemService {
                 }
             }
 
-            if (bestAutoBid != null) {
+            if (bestAutoBid != null && !bestAutoBid.getUserId().equals(item.getCurrentWinnerId())) {
                 item.setCurrentHighestBid(requirePrice);
                 item.setCurrentWinnerId(bestAutoBid.getUserId());
                 priceChange = true;
