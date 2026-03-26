@@ -221,6 +221,7 @@ public class ItemService {
             double requirePrice = item.getCurrentHighestBid() + item.getBidIncrement();
             AutoBid bestAutoBid = null;
             for (AutoBid ab: item.getAutoBids()) {
+                if (ab.getUserId() == item.getCurrentWinnerId()) continue ;
                 if (ab.getMaxBid() >= requirePrice) {
                     if (bestAutoBid == null) {
                         bestAutoBid = ab;
@@ -236,7 +237,7 @@ public class ItemService {
                 }
             }
 
-            if (bestAutoBid != null && !bestAutoBid.getUserId().equals(item.getCurrentWinnerId())) {
+            if (bestAutoBid != null) {
                 item.setCurrentHighestBid(requirePrice);
                 item.setCurrentWinnerId(bestAutoBid.getUserId());
                 priceChange = true;
