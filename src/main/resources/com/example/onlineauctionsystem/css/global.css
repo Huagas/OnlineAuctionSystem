@@ -1,0 +1,62 @@
+.root-pane {
+    -fx-background-color: #f8f9fa;
+}
+
+.scroll-pane-transparent, .scroll-pane-transparent > .viewport {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.text-muted {
+    -fx-text-fill: #7f8c8d;
+}
+
+.text-dark-bold {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}
+
+.page-title {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 22px;
+}
+
+.primary-btn{
+    -fx-background-color: #8b0000;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.primary-btn-large {
+    -fx-background-color: #8b0000;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+
+.logout-btn {
+    -fx-background-color: #fce4e4;
+    -fx-text-fill: #cc0000;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.back-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b0000;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.filter-box {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 5;
+}

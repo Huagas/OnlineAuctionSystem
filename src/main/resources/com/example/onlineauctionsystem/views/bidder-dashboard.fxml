@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-pane" stylesheets="@../css/global.css, @../css/bidder-dashboard.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.BidderDashboardController">
+
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <HBox alignment="CENTER_LEFT" prefHeight="35.0" styleClass="top-nav-bar" spacing="20.0">
+            <padding><Insets left="40.0" right="40.0" /></padding>
+            <children>
+               <Label text="Tel: 0976 448 440" styleClass="nav-text-white" />
+               <Label text="Email: info@daugiavietnam.vn" styleClass="nav-text-white" />
+               <Region HBox.hgrow="ALWAYS" />
+               <Label text="Tin tức" styleClass="nav-text-white" />
+               <Label text="Liên hệ" styleClass="nav-text-white" />
+               <Label text="VI | EN" styleClass="nav-text-white-bold" />
+            </children>
+         </HBox>
+
+         <HBox alignment="CENTER_LEFT" prefHeight="75.0" styleClass="main-nav-bar" spacing="20.0">
+            <padding><Insets left="40.0" right="40.0" /></padding>
+            <children>
+               <VBox alignment="CENTER_LEFT">
+                  <Label text="LẠC VIỆT" styleClass="logo-title" />
+                  <Label text="AUCTION SYSTEM" styleClass="logo-subtitle" />
+               </VBox>
+               <Region HBox.hgrow="ALWAYS" />
+               <HBox alignment="CENTER" spacing="15.0">
+                  <Button mnemonicParsing="false" styleClass="nav-btn" text="Trang chủ" />
+                  <Button mnemonicParsing="false" styleClass="nav-btn-active" text="Tài sản đấu giá" />
+               </HBox>
+               <Region HBox.hgrow="ALWAYS" />
+               <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                  <VBox alignment="CENTER_RIGHT">
+                     <Label fx:id="welcomeLabel" text="Xin chào, User" styleClass="text-dark-bold" style="-fx-font-size: 14px;" />
+                     <Label fx:id="walletLabel" text="Ví: $0.0" style="-fx-text-fill: #27ae60; -fx-font-size: 12px;" />
+                  </VBox>
+                  <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="35.0" styleClass="logout-btn" text="Đăng xuất" />
+               </HBox>
+            </children>
+         </HBox>
+      </VBox>
+   </top>
+
+   <center>
+      <ScrollPane fitToWidth="true" styleClass="scroll-pane-transparent" BorderPane.alignment="CENTER">
+         <content>
+            <VBox spacing="20.0">
+               <padding><Insets bottom="50.0" left="80.0" right="80.0" top="30.0" /></padding>
+               <children>
+                  <Label text="Trang chủ &gt; Tài sản đấu giá" styleClass="text-muted" />
+                  <Label text="Bộ lọc tài sản" styleClass="page-title" />
+
+                  <HBox spacing="15.0">
+                     <TextField prefHeight="45.0" promptText="Tìm kiếm tài sản..." styleClass="filter-box" HBox.hgrow="ALWAYS" />
+                     <ComboBox prefHeight="45.0" prefWidth="150.0" promptText="Sắp xếp theo" styleClass="filter-box" />
+                     <Button mnemonicParsing="false" prefHeight="45.0" prefWidth="120.0" styleClass="primary-btn" text="Bộ lọc tài sản" />
+                  </HBox>
+
+                  <Label fx:id="itemCountLabel" text="Hiển thị 0 sản phẩm" styleClass="text-muted" style="-fx-font-size: 14px;" />
+
+                  <FlowPane fx:id="itemGrid" hgap="25.0" vgap="25.0">
+                  </FlowPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

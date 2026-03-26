@@ -1,0 +1,22 @@
+.detail-title { -fx-text-fill: #333333; -fx-font-weight: bold; -fx-font-size: 28px; }
+.price-highlight { -fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 22px; }
+
+.detail-box {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
+}
+
+.image-placeholder-large {
+    -fx-background-color: #e0e0e0;
+    -fx-background-radius: 10;
+}
+
+.clock-box {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 15;
+    -fx-background-radius: 8;
+}
+.clock-number { -fx-text-fill: #2980b9; -fx-font-weight: bold; -fx-font-size: 28px; }
+.clock-colon { -fx-text-fill: #2980b9; -fx-font-weight: bold; -fx-font-size: 24px; }
+.clock-seconds { -fx-text-fill: #e74c3c; -fx-font-weight: bold; -fx-font-size: 28px; }

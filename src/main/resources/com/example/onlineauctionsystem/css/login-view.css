@@ -1,0 +1,45 @@
+.btn-primary {
+    -fx-background-color: #b71c1c;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+    -fx-background-radius: 5px;
+}
+
+.btn-primary:hover {
+    -fx-background-color: white;
+    -fx-text-fill: #d32f2f;
+    -fx-border-color: #d32f2f;
+}
+
+.upload-box {
+    -fx-border-color: #90caf9;
+    -fx-border-style: dashed;
+    -fx-border-width: 1.5;
+    -fx-background-color: #f8fbff;
+    -fx-cursor: hand;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+}
+
+.upload-box:hover {
+    -fx-background-color: #e3f2fd;
+}
+
+.text-field {
+    -fx-font-size: 14px;
+    -fx-background-radius: 4px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4px;
+    -fx-background-color: white;
+}
+
+.text-field:focused {
+    -fx-border-color: #2196f3;
+}
+
+.label-hint {
+    -fx-text-fill: #9e9e9e;
+    -fx-font-size: 12px;
+}
