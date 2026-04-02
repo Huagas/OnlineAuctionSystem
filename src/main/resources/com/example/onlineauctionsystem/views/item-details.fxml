@@ -125,7 +125,9 @@
                                  <children>
                                     <Label style="-fx-font-size: 14px;" styleClass="text-dark-bold" text="Số tiền đấu giá (?):" />
                                     <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                                    <Label fx:id="modeIndicatorLabel" onMouseClicked="#toggleMode" style="-fx-text-fill: #2ecc71; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-color: #e8f8f5; -fx-padding: 3 8 3 8; -fx-border-radius: 10;" text="Auto" />
+                                     <Label fx:id="modeIndicatorLabel" onMouseClicked="#toggleMode"
+                                            style="-fx-text-fill: #95a5a6; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-color: #f2f4f4; -fx-padding: 3 8 3 8; -fx-background-radius: 10; -fx-border-radius: 10;"
+                                            text="Manual" />
                                  </children>
                               </HBox>
                               <HBox prefHeight="100.0" prefWidth="200.0">

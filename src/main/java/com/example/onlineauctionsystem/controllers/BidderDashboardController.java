@@ -26,7 +26,9 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BidderDashboardController implements AuctionObserver {
     @FXML private Label welcomeLabel;
@@ -36,6 +38,8 @@ public class BidderDashboardController implements AuctionObserver {
     @FXML private FlowPane itemGrid;
     @FXML private Timeline tableRefreshTimeline;
     private User currentUser;
+
+    private final Map<String, VBox> itemCardMap = new HashMap<>();
 
     public void initData(User user) {
         this.currentUser = user;
@@ -48,6 +52,7 @@ public class BidderDashboardController implements AuctionObserver {
         loadItemGrid();
         ItemService.addObserver(this);
         startTableAutoRefresh();
+        setupCloseRequest();
     }
 
     @Override
@@ -58,7 +63,7 @@ public class BidderDashboardController implements AuctionObserver {
     }
 
     private void startTableAutoRefresh() {
-        tableRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(30), event -> {
+        tableRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
             loadItemGrid();
         }));
         tableRefreshTimeline.setCycleCount(Animation.INDEFINITE);
@@ -66,19 +71,32 @@ public class BidderDashboardController implements AuctionObserver {
     }
 
     private void loadItemGrid() {
-        itemGrid.getChildren().clear();
         List<Item> allItems = ItemService.getAllItems();
         itemCountLabel.setText("Hiển thị " + allItems.size() + " sản phẩm");
         for (Item item: allItems) {
-            VBox card = createItemCard(item);
-            itemGrid.getChildren().add(card);
+            if (itemCardMap.containsKey(item.getId())) {
+                VBox existingCard = itemCardMap.get(item.getId());
+                updateCardContent(existingCard, item);
+            } else {
+                VBox newCard = createItemCard(item);
+                itemCardMap.put(item.getId(), newCard);
+                itemGrid.getChildren().add(newCard);
+            }
         }
+
+        itemCardMap.keySet().removeIf(id -> {
+            boolean exist = allItems.stream().anyMatch(i -> i.getId().equals(id));
+            if (!exist) {
+                itemGrid.getChildren().remove(itemCardMap.get(id));
+            }
+            return !exist;
+        });
     }
 
     private VBox createItemCard(Item item) {
         VBox card = new VBox(10);
         card.setPrefWidth(260);
-
+        card.setUserData(item.getId());
         card.getStyleClass().add("item-card");
 
         StackPane imageBox = new StackPane();
@@ -100,26 +118,46 @@ public class BidderDashboardController implements AuctionObserver {
         HBox priceBox = createRow("Giá khởi điểm:", String.format("$%,.0f", item.getStartingPrice()));
         HBox depositBox = createRow("Giá cao nhất:", String.format("$%,.0f", item.getCurrentHighestBid()));
 
+        Label lblHighestValue = (Label) depositBox.getChildren().get(2);
+        lblHighestValue.setId("highest-bid-" + item.getId());
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
         HBox timeBox = createRow("Thời gian:", item.getStartTime().format(formatter));
 
         HBox statusBox = createRow("Trạng thái:", item.getStatus());
         Label lblStatusValue = (Label) statusBox.getChildren().get(2);
-
-        String status = item.getStatus();
-        if (status.equals("Đang diễn ra")) {
-            lblStatusValue.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
-        } else if (status.equals("Đã kết thúc") || status.equals("Đã thanh toán") || status.equals("Đã hủy")) {
-            lblStatusValue.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
-        } else {
-            lblStatusValue.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
-        }
+        lblStatusValue.setId("status-" + item.getId());
+        updateStatusStyle(lblStatusValue, item.getStatus());
 
         infoBox.getChildren().addAll(nameLabel, new Region(), priceBox, depositBox, timeBox, statusBox);
         card.getChildren().addAll(imageBox, infoBox);
 
         card.setOnMouseClicked(event -> openItemDetails(item));
         return card;
+    }
+
+    private void updateCardContent(VBox card, Item item) {
+        Label lblHighestValue = (Label) card.lookup("#highest-bid-" + item.getId());
+        if (lblHighestValue != null) {
+            String newPrice = String.format("$%,.0f", item.getCurrentHighestBid());
+            lblHighestValue.setText(newPrice);
+        }
+
+        Label lblStatusValue = (Label) card.lookup("#status-" + item.getId());
+        if (lblStatusValue != null) {
+            lblStatusValue.setText(item.getStatus());
+            updateStatusStyle(lblStatusValue, item.getStatus());
+        }
+    }
+
+    private void updateStatusStyle(Label lbl, String status) {
+        if (status.equals("Đang diễn ra")) {
+            lbl.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+        } else if (status.equals("Đã kết thúc") || status.equals("Đã thanh toán") || status.equals("Đã hủy")) {
+            lbl.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+        } else {
+            lbl.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
+        }
     }
 
     private HBox createRow(String title, String value) {
@@ -153,13 +191,26 @@ public class BidderDashboardController implements AuctionObserver {
         }
     }
 
-    @FXML
-    protected void handleLogout(ActionEvent event) throws IOException {
+    private void cleanup() {
         if (tableRefreshTimeline != null) tableRefreshTimeline.stop();
         ItemService.removeObserver(this);
+    }
+
+    @FXML
+    protected void handleLogout(ActionEvent event) throws IOException {
+        cleanup();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/onlineauctionsystem/views/login-view.fxml"));
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(loader.load(), 450, 550));
         stage.centerOnScreen();
+    }
+
+    private void setupCloseRequest() {
+        Platform.runLater(() -> {
+            if (welcomeLabel.getScene() != null) {
+                Stage stage = (Stage) welcomeLabel.getScene().getWindow();
+                stage.setOnCloseRequest(event -> cleanup());
+            }
+        });
     }
 }

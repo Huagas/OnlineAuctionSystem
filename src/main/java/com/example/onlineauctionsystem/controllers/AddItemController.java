@@ -33,7 +33,6 @@ public class AddItemController {
     @FXML private TextField extraField2;
 
     private User currentSeller;
-    private boolean isSaved = false;
 
     @FXML
     public void initialize() {
@@ -87,10 +86,6 @@ public class AddItemController {
         categoryBox.setDisable(true);
     }
 
-    public boolean isSaved() {
-        return isSaved;
-    }
-
     @FXML
     protected void handleSave(ActionEvent event) {
         try {
@@ -137,7 +132,6 @@ public class AddItemController {
                     ItemService.addItem(newItem);
                 }
 
-                isSaved = true;
                 closeWindow(event);
             }
         } catch (NumberFormatException e) {

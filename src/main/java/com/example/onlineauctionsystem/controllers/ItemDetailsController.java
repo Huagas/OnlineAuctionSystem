@@ -1,5 +1,6 @@
 package com.example.onlineauctionsystem.controllers;
 
+import com.example.onlineauctionsystem.models.AutoBid;
 import com.example.onlineauctionsystem.models.Item;
 import com.example.onlineauctionsystem.models.User;
 import com.example.onlineauctionsystem.services.ItemService;
@@ -39,7 +40,7 @@ public class ItemDetailsController implements AuctionObserver {
     @FXML private Button bidButton;
 
     @FXML private Label modeIndicatorLabel;
-    private boolean isAutoMode = true;
+    private boolean isAutoMode = false;
 
     private Item currentItem;
     private User currentUser;
@@ -48,14 +49,14 @@ public class ItemDetailsController implements AuctionObserver {
     public void initData(Item item, User user) {
         this.currentItem = item;
         this.currentUser = user;
-
         titleLabel.setText(item.getName());
         descLabel.setText(item.getDescription());
         startPriceLabel.setText(String.format("$%,.0f", item.getStartingPrice()));
+        checkExistingAutoMode();
         updateCurrentBidDisplay();
         startCountdownTimer();
-
         ItemService.addObserver(this);
+        setupCloseRequest();
     }
 
     @Override
@@ -65,9 +66,20 @@ public class ItemDetailsController implements AuctionObserver {
         });
     }
 
+    private void checkExistingAutoMode() {
+        boolean found = false;
+        for (AutoBid ab: currentItem.getAutoBids()) {
+            if (ab.getUserId().equals(currentUser.getId())) {
+                found = true;
+                break;
+            }
+        }
+        this.isAutoMode = found;
+        updateModeUI();
+    }
+
     private void updateCurrentBidDisplay() {
         currentBidLabel.setText(String.format("$%,.0f", currentItem.getCurrentHighestBid()));
-
         String winnerId = currentItem.getCurrentWinnerId();
         if (winnerId == null || winnerId.equals("NONE")) {
             if (currentWinnerLabel != null) {
@@ -77,14 +89,12 @@ public class ItemDetailsController implements AuctionObserver {
             User winner = UserService.getUserById(winnerId);
             if (winner != null && currentWinnerLabel != null) {
                 String username = winner.getUsername();
-
                 String maskedName;
                 if (username.length() <= 3) {
                     maskedName = username.substring(0, 1) + "***";
                 } else {
                     maskedName = username.substring(0, 3) + "***";
                 }
-
                 if (winnerId.equals(currentUser.getId())) {
                     currentWinnerLabel.setText("Bạn (Đang dẫn đầu)");
                     currentWinnerLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
@@ -94,28 +104,15 @@ public class ItemDetailsController implements AuctionObserver {
                 }
             }
         }
-
-        if (isAutoMode && !bidAmountField.isFocused()) {
-            double suggestedBid;
-            if (currentItem.getCurrentWinnerId().equals("NONE")) {
-                suggestedBid = currentItem.getStartingPrice();
-            } else {
-                suggestedBid = currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
-            }
-            String suggestedStr = String.format("%.0f", suggestedBid);
-            bidAmountField.setText(suggestedStr);
-        }
     }
 
     private void startCountdownTimer() {
         timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             LocalDateTime now = LocalDateTime.now();
             String status = currentItem.getStatus();
-
             if (statusLabel != null) {
                 statusLabel.setText(status);
             }
-
             if (status.equals("Chờ bắt đầu")) {
                 java.time.Duration duration = java.time.Duration.between(now, currentItem.getStartTime());
                 updateTimerLabels(duration);
@@ -139,7 +136,6 @@ public class ItemDetailsController implements AuctionObserver {
                 bidButton.setText("ĐÃ KẾT THÚC");
             }
         }));
-
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
@@ -149,7 +145,6 @@ public class ItemDetailsController implements AuctionObserver {
         long hours = duration.toHours() % 24;
         long minutes = duration.toMinutes() % 60;
         long seconds = duration.toSeconds() % 60;
-
         dayLabel.setText(String.format("%02d", days));
         hourLabel.setText(String.format("%02d", hours));
         minuteLabel.setText(String.format("%02d", minutes));
@@ -170,17 +165,14 @@ public class ItemDetailsController implements AuctionObserver {
             showAlert(Alert.AlertType.WARNING, "Lỗi", "Vui lòng nhập số tiền bạn muốn đấu giá!");
             return ;
         }
-
         try {
             double bidAmount = Double.parseDouble(inputStr);
-
             String resultMsg;
             if (isAutoMode) {
                 resultMsg = ItemService.registerAutoBid(currentItem.getId(), currentUser.getId(), bidAmount);
             } else {
                 resultMsg = ItemService.placeBid(currentItem.getId(), currentUser.getId(), bidAmount);
             }
-
             if (resultMsg.equals("SUCCESS")) {
                 updateCurrentBidDisplay();
                 bidAmountField.clear();
@@ -205,9 +197,7 @@ public class ItemDetailsController implements AuctionObserver {
             double currentVal = Double.parseDouble(bidAmountField.getText());
             bidAmountField.setText(String.format("%.0f", currentVal + currentItem.getBidIncrement()));
         } catch (Exception e) {
-            double minAllowed = currentItem.getCurrentWinnerId().equals("NONE")
-                    ? currentItem.getStartingPrice()
-                    : currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
+            double minAllowed = getSuggestedBid();
             bidAmountField.setText(String.format("%.0f", minAllowed));
         }
     }
@@ -216,50 +206,57 @@ public class ItemDetailsController implements AuctionObserver {
     protected void handleDecreaseBid() {
         try {
             double currentVal = Double.parseDouble(bidAmountField.getText());
-            double minAllowed = currentItem.getCurrentWinnerId().equals("NONE")
-                    ? currentItem.getStartingPrice()
-                    : currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
-            if (currentVal - currentItem.getBidIncrement() >= minAllowed) {
-                bidAmountField.setText(String.format("%.0f", currentVal - currentItem.getBidIncrement()));
+            double minAllowed = getSuggestedBid();
+            if (currentVal > minAllowed) {
+                bidAmountField.setText(String.format("%.0f", Math.max(minAllowed, currentVal - currentItem.getBidIncrement())));
             }
         } catch (Exception e) {}
-    }
-
-    private void switchToManualMode() {
-        isAutoMode = false;
-        if (modeIndicatorLabel != null) {
-            modeIndicatorLabel.setText("Manual");
-            modeIndicatorLabel.setStyle("-fx-text-fill: #95a5a6; -fx-font-weight: bold;");
-        }
     }
 
     @FXML
     protected void toggleMode() {
         isAutoMode = !isAutoMode;
-        if (isAutoMode) {
-            if (modeIndicatorLabel != null) {
-                modeIndicatorLabel.setText("Auto");
-                modeIndicatorLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
-            }
+        updateModeUI();
+    }
 
-            double suggestedBid;
-            if (currentItem.getCurrentWinnerId().equals("NONE")) {
-                suggestedBid = currentItem.getStartingPrice();
-            } else {
-                suggestedBid = currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
-            }
-            bidAmountField.setText(String.format("%.0f", suggestedBid));
+    private double getSuggestedBid() {
+        return currentItem.getCurrentWinnerId().equals("NONE")
+                ? currentItem.getStartingPrice()
+                : currentItem.getCurrentHighestBid() + currentItem.getBidIncrement();
+    }
+
+    private void updateModeUI() {
+        if (modeIndicatorLabel == null) return;
+        if (isAutoMode) {
+            modeIndicatorLabel.setText("Auto");
+            modeIndicatorLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold; " +
+                    "-fx-background-color: #e8f8f5; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
         } else {
-            switchToManualMode();
+            modeIndicatorLabel.setText("Manual");
+            modeIndicatorLabel.setStyle("-fx-text-fill: #95a5a6; -fx-font-weight: bold; " +
+                    "-fx-background-color: #f2f4f4; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
         }
+    }
+
+    private void cleanup() {
+        if (timeline != null) timeline.stop();
+        ItemService.removeObserver(this);
     }
 
     @FXML
     protected void handleClose(ActionEvent event) {
-        if (timeline != null) timeline.stop();
-        ItemService.removeObserver(this);
+        cleanup();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.close();
+    }
+
+    private void setupCloseRequest() {
+        Platform.runLater(() -> {
+            if (titleLabel.getScene() != null) {
+                Stage stage = (Stage) titleLabel.getScene().getWindow();
+                stage.setOnCloseRequest(event -> cleanup());
+            }
+        });
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {

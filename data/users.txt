@@ -2,4 +2,4 @@ Admin,4f233544-655a-4933-8538-ec022b05ed42,admin,123,admin@gmail.com,0853315868,
 Bidder,ef8d394b-8a66-46ca-b69a-4ac5dbc38b83,nguyenvana,123,vana@gmail.com,0901234567,Cá nhân
 Seller,8f28e04d-d4c9-4a86-9848-6c1689df54ba,cty_thanhly,123,contact@thanhly.vn,0243123456,Tổ chức
 Seller,367073bc-3935-41e4-9935-2c66d020d88a,nguyenthib,123,nguyenthib@gmail.com,0915166167,Cá nhân
-Bidder,c73d96db-036d-4d77-a1be-2cee8b42e861,nguyenvanc,Nguyenvanc1!,nguyenvanc@gmail.com,0123,Cá nhân
+Bidder,c73d96db-036d-4d77-a1be-2cee8b42e861,nguyenvanc,123,nguyenvanc@gmail.com,0123,Cá nhân

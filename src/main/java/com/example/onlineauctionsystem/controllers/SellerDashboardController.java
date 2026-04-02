@@ -46,20 +46,14 @@ public class SellerDashboardController implements AuctionObserver {
     public void initData(User user) {
         this.currentUser = user;
         welcomeLabel.setText("Xin chào Seller: " + user.getUsername());
-        System.out.println(user.getId());
+        setupTableColumns();
         loadMyItems();
         ItemService.addObserver(this);
         startTableAutoRefresh();
+        setupCloseRequest();
     }
 
-    @Override
-    public void onAuctionUpdate() {
-        Platform.runLater(() -> {
-            itemTable.refresh();
-        });
-    }
-
-    private void loadMyItems() {
+    private void setupTableColumns() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colCategory.setCellValueFactory(new PropertyValueFactory<>("category"));
@@ -74,17 +68,24 @@ public class SellerDashboardController implements AuctionObserver {
                 new SimpleStringProperty(cellData.getValue().getEndTime().format(formatter)));
 
         colStatus.setCellValueFactory(cellData ->
-            new SimpleStringProperty(cellData.getValue().getStatus()));
+                new SimpleStringProperty(cellData.getValue().getStatus()));
+    }
 
+    @Override
+    public void onAuctionUpdate() {
+        Platform.runLater(() -> {
+            loadMyItems();
+        });
+    }
+
+    private void loadMyItems() {
         List<Item> allItems = ItemService.getItemsBySeller(currentUser.getId());
         ObservableList<Item> observableList = FXCollections.observableArrayList(allItems);
         itemTable.setItems(observableList);
     }
 
     private void startTableAutoRefresh() {
-        tableRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(5), event ->  {
-            itemTable.refresh();
-        }));
+        tableRefreshTimeline = new Timeline(new KeyFrame(Duration.seconds(5), event -> itemTable.refresh()));
         tableRefreshTimeline.setCycleCount(Animation.INDEFINITE);
         tableRefreshTimeline.play();
     }
@@ -102,9 +103,6 @@ public class SellerDashboardController implements AuctionObserver {
             controller.setSeller(currentUser);
 
             popupStage.showAndWait();
-            if (controller.isSaved()) {
-                loadMyItems();
-            }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Lỗi không thể mở cửa sổ: " + e.getMessage());
@@ -126,9 +124,7 @@ public class SellerDashboardController implements AuctionObserver {
 
         if (confirm.getResult() == ButtonType.YES) {
             boolean success = ItemService.deleteItem(selectedItem.getId());
-            if (success) {
-                loadMyItems();
-            } else {
+            if (!success) {
                 showAlert(Alert.AlertType.ERROR, "Lỗi", "Không thể xóa tài sản này.");
             }
         }
@@ -153,9 +149,6 @@ public class SellerDashboardController implements AuctionObserver {
             controller.setEditMode(selectedItem);
 
             popupStage.showAndWait();
-            if (controller.isSaved()) {
-                loadMyItems();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -233,14 +226,27 @@ public class SellerDashboardController implements AuctionObserver {
         }
     }
 
-    @FXML
-    protected void handleLogout(ActionEvent event) throws IOException {
+    private void cleanup() {
         if (tableRefreshTimeline != null) tableRefreshTimeline.stop();
         ItemService.removeObserver(this);
+    }
+
+    @FXML
+    protected void handleLogout(ActionEvent event) throws IOException {
+        cleanup();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/onlineauctionsystem/views/login-view.fxml"));
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(loader.load()));
         stage.centerOnScreen();
+    }
+
+    private void setupCloseRequest() {
+        Platform.runLater(() -> {
+            if (welcomeLabel.getScene() != null) {
+                Stage stage = (Stage) welcomeLabel.getScene().getWindow();
+                stage.setOnCloseRequest(event -> cleanup());
+            }
+        });
     }
 
     private void showAlert(Alert.AlertType type, String title, String msg) {

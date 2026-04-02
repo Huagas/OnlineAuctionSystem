@@ -7,10 +7,13 @@ import com.example.onlineauctionsystem.models.Item;
 import com.example.onlineauctionsystem.utils.AuctionObserver;
 
 import java.io.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ItemService {
     private static List<Item> itemList = new ArrayList<>();
@@ -43,6 +46,7 @@ public class ItemService {
     public static void addItem(Item item) {
         itemList.add(item);
         saveItemsToFile();
+        notifyObservers();
         System.out.println("Đã thêm sản phẩm mới: " + item.getName());
     }
 
@@ -74,6 +78,7 @@ public class ItemService {
             if (itemList.get(i).getId().equals(updatedItem.getId())) {
                 itemList.set(i, updatedItem);
                 saveItemsToFile();
+                notifyObservers();
                 return true;
             }
         }
@@ -84,33 +89,39 @@ public class ItemService {
         boolean isRemoved = itemList.removeIf(item -> item.getId().equals(id));
         if (isRemoved) {
             saveItemsToFile();
+            notifyObservers();
         }
         return isRemoved;
     }
 
-    private static void saveItemsToFile() {
-        File directory = new File(DIR_PATH);
-        if (!directory.exists()) directory.mkdirs();
+    private static boolean saveItemsToFile() {
+        synchronized (FILE_LOCK) {
+            File directory = new File(DIR_PATH);
+            if (!directory.exists()) directory.mkdirs();
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            for (Item item: itemList) {
-                String baseInfo = item.getId() + "," + item.getName() + "," + item.getDescription() + "," +
-                        item.getStartingPrice() + "," + item.getCurrentHighestBid() + "," + item.getStartTime().format(FORMATTER) + "," +
-                        item.getEndTime().format(FORMATTER) + "," + item.getSellerId() + "," + item.getCurrentWinnerId() + "," + item.getPaymentStatus();
-                String line = "";
-                if (item instanceof Electronics) {
-                    Electronics e = (Electronics) item;
-                    line = "Electronics," + baseInfo + "," + e.getBrand() + "," + e.getWarrantyMonths();
-                } else if (item instanceof Art) {
-                    Art a = (Art) item;
-                    line = "Art," + baseInfo + "," + a.getArtist() + "," + a.getMaterial();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+                for (Item item: itemList) {
+                    String baseInfo = item.getId() + "," + item.getName() + "," + item.getDescription() + "," +
+                            item.getStartingPrice() + "," + item.getCurrentHighestBid() + "," + item.getStartTime().format(FORMATTER) + "," +
+                            item.getEndTime().format(FORMATTER) + "," + item.getSellerId() + "," + item.getCurrentWinnerId() + "," + item.getPaymentStatus();
+                    String line = "";
+                    if (item instanceof Electronics) {
+                        Electronics e = (Electronics) item;
+                        line = "Electronics," + baseInfo + "," + e.getBrand() + "," + e.getWarrantyMonths();
+                    } else if (item instanceof Art) {
+                        Art a = (Art) item;
+                        line = "Art," + baseInfo + "," + a.getArtist() + "," + a.getMaterial();
+                    }
+
+                    writer.write(line);
+                    writer.newLine();
                 }
 
-                writer.write(line);
-                writer.newLine();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -157,31 +168,6 @@ public class ItemService {
         }
     }
 
-    public static String placeBid(String itemId, String bidderId, double newBidAmount) {
-        Item item = getItemById(itemId);
-        if (item == null) return "Tài sản không tồn tại!";
-        String status = item.getStatus();
-        if (status.equals("Chờ bắt đầu")) return "Phiên đấu giá chưa mở cửa!";
-        if (status.equals("Đã kết thúc")) return "Phiên đấu giá đã kết thúc!";
-
-        if (item.getCurrentWinnerId().equals("NONE")) {
-            if (newBidAmount < item.getStartingPrice()) {
-                return "Lần trả giá đầu tiên không được thấp hơn Giá khởi điểm (" + item.getStartingPrice() + "$)!";
-            }
-        } else {
-            if (newBidAmount < item.getCurrentHighestBid()) {
-                return "Giá đặt phải cao hơn giá dẫn đầu hiện tại (" + item.getCurrentHighestBid() + "$)!";
-            }
-        }
-
-        item.setCurrentHighestBid(newBidAmount);
-        item.setCurrentWinnerId(bidderId);
-        processAutoBiddingWar(item);
-        saveItemsToFile();
-        notifyObservers();
-        return "SUCCESS";
-    }
-
     public static boolean updatePaymentStatus(String itemId, String newStatus) {
         Item item = getItemById(itemId);
         if (item != null) {
@@ -195,33 +181,16 @@ public class ItemService {
         return false;
     }
 
-    public static String registerAutoBid(String itemId, String userId, double maxBidAmount) {
-        Item item = getItemById(itemId);
-        if (item == null) return "Tài sản không tồn tại!";
-
-        double minRequired = item.getCurrentWinnerId().equals("NONE")
-                ? item.getStartingPrice()
-                : item.getCurrentHighestBid() + item.getBidIncrement();
-
-        if (maxBidAmount < minRequired) {
-            return "Mức giá tối đa không được thấp hơn mức giá tối thiểu yêu cầu ($" + minRequired + ")!";
-        }
-
-        item.getAutoBids().add(new AutoBid(userId, maxBidAmount));
-        processAutoBiddingWar(item);
-        saveItemsToFile();
-        notifyObservers();
-        return "SUCCESS";
-    }
-
     private static void processAutoBiddingWar(Item item) {
         boolean priceChange = true;
         while (priceChange) {
             priceChange = false;
-            double requirePrice = item.getCurrentHighestBid() + item.getBidIncrement();
+            double requirePrice = item.getCurrentWinnerId().equals("NONE")
+                    ? item.getStartingPrice()
+                    : item.getCurrentHighestBid() + item.getBidIncrement();
             AutoBid bestAutoBid = null;
             for (AutoBid ab: item.getAutoBids()) {
-                if (ab.getUserId() == item.getCurrentWinnerId()) continue ;
+                if (ab.getUserId().equals(item.getCurrentWinnerId())) continue ;
                 if (ab.getMaxBid() >= requirePrice) {
                     if (bestAutoBid == null) {
                         bestAutoBid = ab;
@@ -242,6 +211,86 @@ public class ItemService {
                 item.setCurrentWinnerId(bestAutoBid.getUserId());
                 priceChange = true;
             }
+        }
+    }
+
+    private static final ConcurrentHashMap<String, ReentrantLock> itemLocks = new ConcurrentHashMap<>();
+    private static final Object FILE_LOCK = new Object();
+
+    private static ReentrantLock getLockFromItem(String itemId) {
+        return itemLocks.computeIfAbsent(itemId, k -> new ReentrantLock(true));
+    }
+
+    public static String placeBid(String itemId, String bidderId, double newBidAmount) {
+        ReentrantLock lock = getLockFromItem(itemId);
+        lock.lock();
+        try {
+            Item item = getItemById(itemId);
+            if (item == null) return "Sản phẩm không tồn tại!";
+            String status = item.getStatus();
+            if (status.equals("Chờ bắt đầu")) return "Phiên đấu giá chưa mở cửa!";
+            if (status.equals("Đã kết thúc")) return "Phiên đấu giá đã kết thúc!";
+
+            double minRequired = item.getCurrentWinnerId().equals("NONE")
+                    ? item.getStartingPrice()
+                    : item.getCurrentHighestBid() + item.getBidIncrement();
+
+            if (newBidAmount < minRequired) {
+                return "Giá đặt tối thiểu phải là " + minRequired + "$!";
+            }
+
+            item.setCurrentHighestBid(newBidAmount);
+            item.setCurrentWinnerId(bidderId);
+            processAutoBiddingWar(item);
+            applyAntiSniping(item);
+            boolean success = saveItemsToFile();
+            if (!success) return "Lỗi hệ thống: Không thể lưu kết quả đấu giá!";
+            notifyObservers();
+            return "SUCCESS";
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public static String registerAutoBid(String itemId, String userId, double maxBidAmount) {
+        ReentrantLock lock = getLockFromItem(itemId);
+        lock.lock();
+        try {
+            Item item = getItemById(itemId);
+            if (item == null) return "Tài sản không tồn tại!";
+
+            double minRequired = item.getCurrentWinnerId().equals("NONE")
+                    ? item.getStartingPrice()
+                    : item.getCurrentHighestBid() + item.getBidIncrement();
+
+            if (maxBidAmount < minRequired) {
+                return "Mức giá tối đa không được thấp hơn mức giá tối thiểu yêu cầu ($" + minRequired + ")!";
+            }
+
+            item.getAutoBids().add(new AutoBid(userId, maxBidAmount));
+            processAutoBiddingWar(item);
+            applyAntiSniping(item);
+            boolean success = saveItemsToFile();
+            if (!success) return "Lỗi hệ thống: Không thể lưu cấu hình AutoBid!";
+            notifyObservers();
+            return "SUCCESS";
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private static final int X_SECONDS = 30;
+    private static final int Y_SECONDS = 60;
+
+    private static void applyAntiSniping(Item item) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime endTime = item.getEndTime();
+
+        Duration duration = Duration.between(now, endTime);
+        long secondsRemaining = duration.getSeconds();
+        if (secondsRemaining > 0 && secondsRemaining <= X_SECONDS) {
+            LocalDateTime newEndTime = endTime.plusSeconds(Y_SECONDS);
+            item.setEndTime(newEndTime);
         }
     }
 }
