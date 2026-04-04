@@ -18,15 +18,46 @@ public abstract class Item extends Entity {
 
     protected double bidIncrement = 10;
     protected List<AutoBid> autoBids = new ArrayList<>();
+    protected List<BidTransaction> bidHistory = new ArrayList<>();
 
     public Item(String name, String description, double startingPrice, LocalDateTime startTime, LocalDateTime endTime, String sellerId) {
         super();
         this.name = name;
         this.description = description;
         this.startingPrice = startingPrice;
+        this.currentHighestBid = startingPrice;
         this.startTime = startTime;
         this.endTime = endTime;
         this.sellerId = sellerId;
+    }
+
+    public Item(String id, LocalDateTime createdAt, String name, String description,
+                double startingPrice, double currentHighestBid, LocalDateTime startTime,
+                LocalDateTime endTime, String sellerId, String currentWinnerId, String paymentStatus) {
+        super(id, createdAt);
+        this.name = name;
+        this.description = description;
+        this.startingPrice = startingPrice;
+        this.currentHighestBid = currentHighestBid;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.sellerId = sellerId;
+        this.currentWinnerId = currentWinnerId;
+        this.paymentStatus = paymentStatus;
+    }
+
+    public void addTransaction(BidTransaction tx) {
+        this.bidHistory.add(tx);
+        this.currentHighestBid = tx.getBidAmount();
+        this.currentWinnerId = tx.getBidderId();
+    }
+
+    public List<BidTransaction> getBidHistory() { return bidHistory; }
+    public void setBidHistory(List<BidTransaction> bidHistory) {
+        this.bidHistory.clear();
+        for (BidTransaction tx: bidHistory) {
+            this.bidHistory.add(new BidTransaction(tx));
+        }
     }
 
     public String getName() { return name; }

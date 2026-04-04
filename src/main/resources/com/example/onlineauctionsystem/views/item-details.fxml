@@ -2,25 +2,27 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700.0" prefWidth="1050.0" styleClass="root-pane" stylesheets="@../css/global.css, @../css/item-details.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.ItemDetailsController">
+<BorderPane prefHeight="750.0" prefWidth="1100.0" styleClass="root-pane" stylesheets="@../css/global-style.css, @../css/item-details-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.ItemDetailsController">
     <padding>
-        <Insets bottom="30.0" left="50.0" right="50.0" top="30.0" />
+        <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
     </padding>
 
     <top>
         <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
             <BorderPane.margin>
-                <Insets bottom="25.0" />
+                <Insets bottom="20.0" />
             </BorderPane.margin>
             <children>
-                <Label style="-fx-font-size: 24px;" styleClass="page-title" text="Chi tiết tài sản đấu giá" />
+                <Label styleClass="page-title" text="Chi tiết tài sản đấu giá" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button mnemonicParsing="false" onAction="#handleClose" styleClass="back-btn" text="← Quay lại danh sách" />
             </children>
@@ -29,123 +31,112 @@
 
     <center>
         <HBox spacing="50.0" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets top="10.0" />
-            </padding>
             <children>
-
                 <VBox spacing="20.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Region prefHeight="300.0" styleClass="image-placeholder-large" VBox.vgrow="NEVER" />
-                        <Label fx:id="titleLabel" styleClass="detail-title" text="Tên sản phẩm tại đây" wrapText="true" />
-                        <Label fx:id="descLabel" style="-fx-font-size: 15px; -fx-line-spacing: 5px;" styleClass="text-muted" text="Mô tả chi tiết nằm ở đây..." wrapText="true" />
-                    </children>
-                </VBox>
-
-                <VBox prefWidth="450.0">
-                    <children>
-                        <VBox spacing="18.0" styleClass="detail-box">
-                            <padding>
-                                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-                            </padding>
+                        <Region minHeight="350.0" prefHeight="400.0" styleClass="image-placeholder-large" VBox.vgrow="ALWAYS" />
+                        <VBox spacing="10.0">
                             <children>
-                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                                      <Label style="-fx-text-fill: #2980b9; -fx-font-size: 18px;" styleClass="text-dark-bold" text="Thông tin Đấu giá" />
-                              <Region HBox.hgrow="ALWAYS" />
-                              <Label fx:id="statusLabel" style="-fx-font-size: 14; -fx-padding: 5 12 5 12; -fx-background-color: #ecf0f1; -fx-background-radius: 15;" text="Đang tải..." />
-                           </children>
-                        </HBox>
-
-                                <HBox alignment="CENTER_LEFT">
-                                    <children>
-                                        <Label style="-fx-font-size: 15px;" styleClass="text-muted" text="Giá khởi điểm:" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="startPriceLabel" minWidth="-Infinity" style="-fx-font-size: 15px;" styleClass="text-dark-bold" text="..." />
-                                    </children>
-                                </HBox>
-
-                                <HBox alignment="CENTER_LEFT">
-                                    <children>
-                                        <Label style="-fx-font-size: 15px;" styleClass="text-muted" text="Giá hiện tại:" />
-                                        <Region HBox.hgrow="ALWAYS" />
-                                        <Label fx:id="currentBidLabel" minWidth="-Infinity" styleClass="price-highlight" text="..." />
-                                    </children>
-                                </HBox>
-
-                                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                   <children>
-                                      <Label style="-fx-font-size: 15px;" styleClass="text-muted" text="Người dẫn đầu:" />
-                                      <Region HBox.hgrow="ALWAYS" />
-                                      <Label fx:id="currentWinnerLabel" minWidth="-Infinity" style="-fx-font-size: 15px; -fx-text-fill: #e67e22;" styleClass="text-dark-bold" text="Chưa có" />
-                                   </children>
-                                </HBox>
-
-                                <Region prefHeight="5.0" />
-
-                                <Label style="-fx-font-size: 15px;" styleClass="text-muted" text="Thời gian kết thúc:" />
-                                <HBox alignment="CENTER" spacing="20.0" styleClass="clock-box">
-                                    <children>
-                                        <VBox alignment="CENTER">
-                                            <children>
-                                                <Label fx:id="dayLabel" minWidth="-Infinity" styleClass="clock-number" text="00" />
-                                                <Label minWidth="-Infinity" styleClass="text-muted" text="Ngày" />
-                                            </children>
-                                        </VBox>
-                                        <Label minWidth="-Infinity" styleClass="clock-colon" text=":" />
-                                        <VBox alignment="CENTER">
-                                            <children>
-                                                <Label fx:id="hourLabel" minWidth="-Infinity" styleClass="clock-number" text="00" />
-                                                <Label minWidth="-Infinity" styleClass="text-muted" text="Giờ" />
-                                            </children>
-                                        </VBox>
-                                        <Label minWidth="-Infinity" styleClass="clock-colon" text=":" />
-                                        <VBox alignment="CENTER">
-                                            <children>
-                                                <Label fx:id="minuteLabel" minWidth="-Infinity" styleClass="clock-number" text="00" />
-                                                <Label minWidth="-Infinity" styleClass="text-muted" text="Phút" />
-                                            </children>
-                                        </VBox>
-                                        <Label minWidth="-Infinity" styleClass="clock-colon" text=":" />
-                                        <VBox alignment="CENTER">
-                                            <children>
-                                                <Label fx:id="secondLabel" minWidth="-Infinity" styleClass="clock-seconds" text="00" />
-                                                <Label minWidth="-Infinity" styleClass="text-muted" text="Giây" />
-                                            </children>
-                                        </VBox>
-                                    </children>
-                                </HBox>
-
-                                <VBox spacing="8.0">
-                                    <VBox.margin>
-                                        <Insets top="15.0" />
-                                    </VBox.margin>
-                                    <children>
-                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                    <Label style="-fx-font-size: 14px;" styleClass="text-dark-bold" text="Số tiền đấu giá (?):" />
-                                    <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                                     <Label fx:id="modeIndicatorLabel" onMouseClicked="#toggleMode"
-                                            style="-fx-text-fill: #95a5a6; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-color: #f2f4f4; -fx-padding: 3 8 3 8; -fx-background-radius: 10; -fx-border-radius: 10;"
-                                            text="Manual" />
-                                 </children>
-                              </HBox>
-                              <HBox prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                    <Button focusTraversable="false" mnemonicParsing="false" onAction="#handleDecreaseBid" prefHeight="50.0" prefWidth="50.0" style="-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-cursor: hand;" text="-" />
-                                    <TextField fx:id="bidAmountField" alignment="CENTER" prefHeight="50.0" promptText="Nhập giá..." style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-radius: 5;" HBox.hgrow="ALWAYS" />
-                                    <Button focusTraversable="false" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleIncreaseBid" prefHeight="50.0" prefWidth="50.0" style="-fx-font-size: 20px; -fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-cursor: hand;" text="+" />
-                                 </children>
-                              </HBox>
-                                        <Button fx:id="bidButton" mnemonicParsing="false" onAction="#handlePlaceBid" prefHeight="55.0" prefWidth="Infinity" styleClass="primary-btn-large" text="XÁC NHẬN ĐẶT GIÁ" />
-                                    </children>
-                                </VBox>
-
+                                <Label fx:id="titleLabel" styleClass="detail-title" text="Tên sản phẩm tại đây" wrapText="true" />
+                                <Separator />
+                                <Label fx:id="descLabel" style="-fx-line-spacing: 5px;" styleClass="text-muted" text="Mô tả chi tiết nằm ở đây..." wrapText="true" />
                             </children>
                         </VBox>
                     </children>
                 </VBox>
 
+                <VBox maxWidth="420.0" minWidth="420.0" prefWidth="420.0" spacing="20.0">
+                    <children>
+
+                        <VBox spacing="10.0" styleClass="detail-box">
+                            <padding>
+                                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                            </padding>
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Diễn biến cuộc đấu giá" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Hyperlink onAction="#handleViewAllTransactions" styleClass="text-link" text="Xem tất cả" />
+                                    </children>
+                                </HBox>
+                                <Separator />
+                                <VBox fx:id="bidHistoryContainer" maxHeight="120.0" minHeight="120.0" prefHeight="120.0" spacing="8.0" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="18.0" styleClass="detail-box">
+                            <padding>
+                                <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
+                            </padding>
+                            <children>
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label style="-fx-font-size: 18px; -fx-text-fill: #2980b9;" styleClass="text-dark-bold" text="Thông tin Đấu giá" />
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="statusLabel" styleClass="status-badge" text="Đang tải..." />
+                                    </children>
+                                </HBox>
+
+                                <VBox spacing="12.0" style="-fx-background-color: #f8f9fa; -fx-padding: 15; -fx-background-radius: 10;">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label styleClass="text-muted" text="Giá khởi điểm:" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="startPriceLabel" styleClass="text-dark-bold" text="..." />
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label styleClass="text-muted" text="Giá hiện tại:" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="currentBidLabel" styleClass="price-highlight" text="..." />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox alignment="CENTER" spacing="10.0" styleClass="clock-box">
+                                    <children>
+                                        <Label style="-fx-font-size: 12px;" styleClass="text-muted" text="Thời gian kết thúc" />
+                                        <HBox alignment="CENTER" spacing="15.0">
+                                            <children>
+                                                <VBox alignment="CENTER"><Label fx:id="dayLabel" styleClass="clock-number" text="00" /><Label styleClass="text-muted-mini" text="Ngày" /></VBox>
+                                                <Label styleClass="clock-colon" text=":" />
+                                                <VBox alignment="CENTER"><Label fx:id="hourLabel" styleClass="clock-number" text="00" /><Label styleClass="text-muted-mini" text="Giờ" /></VBox>
+                                                <Label styleClass="clock-colon" text=":" />
+                                                <VBox alignment="CENTER"><Label fx:id="minuteLabel" styleClass="clock-number" text="00" /><Label styleClass="text-muted-mini" text="Phút" /></VBox>
+                                                <Label styleClass="clock-colon" text=":" />
+                                                <VBox alignment="CENTER"><Label fx:id="secondLabel" styleClass="clock-seconds" text="00" /><Label styleClass="text-muted-mini" text="Giây" /></VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="10.0">
+                                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label styleClass="text-dark-bold" text="Số tiền đấu giá:" />
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="modeIndicatorLabel" onMouseClicked="#toggleMode" styleClass="mode-badge" text="Manual" />
+                                            </children>
+                                        </HBox>
+                                        <HBox spacing="0.0"> <children>
+                                            <Button onAction="#handleDecreaseBid" prefHeight="45.0" prefWidth="45.0" styleClass="math-btn" text="-" />
+                                            <TextField fx:id="bidAmountField" alignment="CENTER" prefHeight="45.0" styleClass="bid-input" HBox.hgrow="ALWAYS" />
+                                            <Button onAction="#handleIncreaseBid" prefHeight="45.0" prefWidth="45.0" styleClass="math-btn" text="+" />
+                                        </children>
+                                        </HBox>
+                                        <Button fx:id="bidButton" mnemonicParsing="false" onAction="#handlePlaceBid" prefHeight="50.0" prefWidth="Infinity" styleClass="primary-btn-large" text="XÁC NHẬN ĐẶT GIÁ" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
             </children>
         </HBox>
     </center>

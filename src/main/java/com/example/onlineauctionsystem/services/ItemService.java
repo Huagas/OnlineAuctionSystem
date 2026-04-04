@@ -1,9 +1,6 @@
 package com.example.onlineauctionsystem.services;
 
-import com.example.onlineauctionsystem.models.Art;
-import com.example.onlineauctionsystem.models.AutoBid;
-import com.example.onlineauctionsystem.models.Electronics;
-import com.example.onlineauctionsystem.models.Item;
+import com.example.onlineauctionsystem.models.*;
 import com.example.onlineauctionsystem.utils.AuctionObserver;
 
 import java.io.*;
@@ -22,6 +19,12 @@ public class ItemService {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static List<AuctionObserver> observers = new ArrayList<>();
+
+    private static final ConcurrentHashMap<String, ReentrantLock> itemLocks = new ConcurrentHashMap<>();
+    private static final Object FILE_LOCK = new Object();
+
+    private static final int X_SECONDS = 30;
+    private static final int Y_SECONDS = 60;
 
     static {
         loadItemsFromFile();
@@ -126,44 +129,96 @@ public class ItemService {
     }
 
     private static void loadItemsFromFile() {
-        File file = new File(FILE_PATH);
-        if (!file.exists()) return ;
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length < 11) return ;
-                String type = data[0];
-                String id = data[1];
-                String name = data[2];
-                String desc = data[3];
-                double startPrice = Double.parseDouble(data[4]);
-                double currentBid = Double.parseDouble(data[5]);
-                LocalDateTime startTime = LocalDateTime.parse(data[6], FORMATTER);
-                LocalDateTime endTime = LocalDateTime.parse(data[7], FORMATTER);
-                String sellerId = data[8];
-                String winnerId = data[9];
-                String paymentStatus = data[10];
-                Item loadedItem = null;
-                if (type.equals("Electronics") && data.length >= 13) {
-                    String brand = data[11];
-                    int warranty = Integer.parseInt(data[12]);
-                    loadedItem = new Electronics(name, desc, startPrice, startTime, endTime, sellerId, brand, warranty);
-                } else if (type.equals("Art") && data.length >= 13) {
-                    String artist = data[11];
-                    String material = data[12];
-                    loadedItem = new Art(name, desc, startPrice, startTime, endTime, sellerId, artist, material);
-                }
+        synchronized (FILE_LOCK) {
+            File file = new File(FILE_PATH);
+            if (!file.exists()) return;
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] data = line.split(",");
+                    if (data.length < 11) return;
+                    String type = data[0];
+                    String id = data[1];
+                    String name = data[2];
+                    String desc = data[3];
+                    double startPrice = Double.parseDouble(data[4]);
+                    double currentBid = Double.parseDouble(data[5]);
+                    LocalDateTime startTime = LocalDateTime.parse(data[6], FORMATTER);
+                    LocalDateTime endTime = LocalDateTime.parse(data[7], FORMATTER);
+                    String sellerId = data[8];
+                    String winnerId = data[9];
+                    String paymentStatus = data[10];
+                    Item loadedItem = null;
+                    if (type.equals("Electronics") && data.length >= 13) {
+                        String brand = data[11];
+                        int warranty = Integer.parseInt(data[12]);
+                        loadedItem = new Electronics(name, desc, startPrice, startTime, endTime, sellerId, brand, warranty);
+                    } else if (type.equals("Art") && data.length >= 13) {
+                        String artist = data[11];
+                        String material = data[12];
+                        loadedItem = new Art(name, desc, startPrice, startTime, endTime, sellerId, artist, material);
+                    }
 
-                if (loadedItem != null) {
-                    loadedItem.setId(id);
-                    loadedItem.setCurrentHighestBid(currentBid);
-                    loadedItem.setCurrentWinnerId(winnerId);
-                    loadedItem.setPaymentStatus(paymentStatus);
-                    itemList.add(loadedItem);
+                    if (loadedItem != null) {
+                        loadedItem.setId(id);
+                        loadedItem.setCurrentHighestBid(currentBid);
+                        loadedItem.setCurrentWinnerId(winnerId);
+                        loadedItem.setPaymentStatus(paymentStatus);
+                        itemList.add(loadedItem);
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
+        }
+    }
+
+    private static void endureDirectoryExists(String DATA_DIR) {
+        File directory = new File(DATA_DIR);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+    }
+
+    public static List<BidTransaction> loadHistoryForItem(String itemId) {
+        ReentrantLock lock = getLockFromItem(itemId);
+        lock.lock();
+
+        try {
+            endureDirectoryExists("data/history/");
+            List<BidTransaction> history = new ArrayList<>();
+            File file = new File("data/history/history_" + itemId + ".txt");
+            if (!file.exists()) return history;
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length >= 6) {
+                        history.add(new BidTransaction(parts[0],
+                                LocalDateTime.parse(parts[1]),
+                                parts[2],
+                                parts[3],
+                                Double.parseDouble(parts[4]),
+                                BidTransaction.BidType.valueOf(parts[5])
+                        ));
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return history;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public static void saveTransaction(BidTransaction tx) {
+        endureDirectoryExists("data/history/");
+        String fileName = "data/history/history_" + tx.getItemId() + ".txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+            writer.write(tx.toCSV());
+            writer.newLine();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -207,15 +262,18 @@ public class ItemService {
             }
 
             if (bestAutoBid != null) {
-                item.setCurrentHighestBid(requirePrice);
-                item.setCurrentWinnerId(bestAutoBid.getUserId());
+                BidTransaction autoTx = new BidTransaction(
+                        item.getId(),
+                        bestAutoBid.getUserId(),
+                        requirePrice,
+                        BidTransaction.BidType.AUTO);
+
+                item.addTransaction(autoTx);
+                saveTransaction(autoTx);
                 priceChange = true;
             }
         }
     }
-
-    private static final ConcurrentHashMap<String, ReentrantLock> itemLocks = new ConcurrentHashMap<>();
-    private static final Object FILE_LOCK = new Object();
 
     private static ReentrantLock getLockFromItem(String itemId) {
         return itemLocks.computeIfAbsent(itemId, k -> new ReentrantLock(true));
@@ -227,6 +285,7 @@ public class ItemService {
         try {
             Item item = getItemById(itemId);
             if (item == null) return "Sản phẩm không tồn tại!";
+
             String status = item.getStatus();
             if (status.equals("Chờ bắt đầu")) return "Phiên đấu giá chưa mở cửa!";
             if (status.equals("Đã kết thúc")) return "Phiên đấu giá đã kết thúc!";
@@ -234,15 +293,19 @@ public class ItemService {
             double minRequired = item.getCurrentWinnerId().equals("NONE")
                     ? item.getStartingPrice()
                     : item.getCurrentHighestBid() + item.getBidIncrement();
-
             if (newBidAmount < minRequired) {
                 return "Giá đặt tối thiểu phải là " + minRequired + "$!";
             }
+
+            BidTransaction newTx = new BidTransaction(itemId, bidderId, newBidAmount, BidTransaction.BidType.MANUAL);
+            item.addTransaction(newTx);
+            saveTransaction(newTx);
 
             item.setCurrentHighestBid(newBidAmount);
             item.setCurrentWinnerId(bidderId);
             processAutoBiddingWar(item);
             applyAntiSniping(item);
+
             boolean success = saveItemsToFile();
             if (!success) return "Lỗi hệ thống: Không thể lưu kết quả đấu giá!";
             notifyObservers();
@@ -262,7 +325,6 @@ public class ItemService {
             double minRequired = item.getCurrentWinnerId().equals("NONE")
                     ? item.getStartingPrice()
                     : item.getCurrentHighestBid() + item.getBidIncrement();
-
             if (maxBidAmount < minRequired) {
                 return "Mức giá tối đa không được thấp hơn mức giá tối thiểu yêu cầu ($" + minRequired + ")!";
             }
@@ -270,6 +332,7 @@ public class ItemService {
             item.getAutoBids().add(new AutoBid(userId, maxBidAmount));
             processAutoBiddingWar(item);
             applyAntiSniping(item);
+
             boolean success = saveItemsToFile();
             if (!success) return "Lỗi hệ thống: Không thể lưu cấu hình AutoBid!";
             notifyObservers();
@@ -279,13 +342,9 @@ public class ItemService {
         }
     }
 
-    private static final int X_SECONDS = 30;
-    private static final int Y_SECONDS = 60;
-
     private static void applyAntiSniping(Item item) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime endTime = item.getEndTime();
-
         Duration duration = Duration.between(now, endTime);
         long secondsRemaining = duration.getSeconds();
         if (secondsRemaining > 0 && secondsRemaining <= X_SECONDS) {

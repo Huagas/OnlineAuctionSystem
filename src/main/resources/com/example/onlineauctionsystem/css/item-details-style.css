@@ -1,0 +1,122 @@
+.root-pane {
+    -fx-background-color: #f4f4f4;
+}
+
+.page-title {
+    -fx-text-fill: #2c3e50;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+.detail-title {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+.price-highlight {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+    -fx-font-size: 26px;
+}
+
+.detail-box {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.05), 10, 0, 0, 3);
+}
+
+.image-placeholder-large {
+    -fx-background-color: #dcdde1;
+    -fx-background-radius: 10;
+}
+
+.clock-box {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 12;
+    -fx-background-radius: 10;
+    -fx-border-color: #ecf0f1;
+    -fx-border-width: 1;
+}
+
+.clock-number {
+    -fx-text-fill: #2980b9;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+.clock-colon {
+    -fx-text-fill: #2980b9;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+}
+
+.clock-seconds {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+.mode-badge {
+    -fx-cursor: hand;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7f8c8d;
+    -fx-background-color: #ecf0f1;
+    -fx-padding: 3 10;
+    -fx-background-radius: 15;
+}
+
+.status-badge {
+    -fx-font-size: 13;
+    -fx-padding: 4 10;
+    -fx-background-color: #ecf0f1;
+    -fx-background-radius: 12;
+    -fx-text-fill: #7f8c8d;
+}
+
+.math-btn {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 5;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+    -fx-cursor: hand;
+}
+
+.math-btn:hover {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #2980b9;
+}
+
+.bid-input {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdde1;
+    -fx-border-width: 1 0 1 0;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.primary-btn-large {
+    -fx-background-color: #930000;
+    -fx-background-radius: 5;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.primary-btn-large:hover {
+    -fx-background-color: #b30000;
+}
+
+.text-muted {
+    -fx-text-fill: #95a5a6;
+    -fx-font-size: 13px;
+}
+
+.text-dark-bold {
+    -fx-text-fill: #333333;
+    -fx-font-weight: bold;
+}

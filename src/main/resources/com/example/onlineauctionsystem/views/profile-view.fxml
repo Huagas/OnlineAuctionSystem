@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="980.0" prefWidth="1280.0" styleClass="root-container" stylesheets="@../css/profile-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.ProfileController">
+    <left>
+        <VBox prefWidth="280.0" spacing="10.0" styleClass="sidebar">
+            <padding><Insets bottom="20.0" left="15.0" right="15.0" top="40.0" /></padding>
+         <children>
+            <Region prefHeight="50.0" prefWidth="200.0" />
+            <VBox alignment="CENTER" prefWidth="100.0" spacing="10.0" styleClass="form-card">
+               <padding>
+                  <Insets bottom="20.0" />
+               </padding>
+               <children>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Thông tin tài khoản" VBox.vgrow="ALWAYS">
+                     <styleClass>
+                        <String fx:value="menu-item" />
+                        <String fx:value="menu-item-active" />
+                     </styleClass>
+                  </Button>
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="menu-item" text="Giỏ hàng" VBox.vgrow="ALWAYS" />
+                  <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="menu-item" text="Lịch sử đấu giá" VBox.vgrow="ALWAYS" />
+                  <Region VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+         </children>
+        </VBox>
+    </left>
+   <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane" BorderPane.alignment="CENTER">
+            <content>
+                <VBox prefWidth="1000.0" spacing="30.0" style="-fx-background-color: white; -fx-background-radius: 15;">
+                    <padding><Insets bottom="40.0" left="40.0" right="40.0" top="30.0" /></padding>
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label styleClass="header-title" text="Thông tin tài khoản" />
+                                    </children>
+                                </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10.0">
+                           <children>
+
+                               <Button mnemonicParsing="false" onAction="#handleChangePassword" prefHeight="35.0" styleClass="btn-update" text="Thay đổi mật khẩu" />
+                           </children>
+                        </HBox>
+                            </children>
+                        </HBox>
+
+                        <Separator />
+
+                        <VBox spacing="15.0" styleClass="form-card">
+                            <children>
+                                <HBox spacing="15.0">
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <StackPane styleClass="input-group">
+                                            <TextField fx:id="usernameField" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Họ và tên *" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                                    </VBox>
+
+                                    <VBox prefWidth="250.0" spacing="5.0">
+                                        <StackPane styleClass="input-group">
+                                            <TextField fx:id="phoneField" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Số điện thoại *" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                                    </VBox>
+
+                                    <VBox prefWidth="250.0" spacing="5.0">
+                                        <StackPane styleClass="input-group">
+                                            <TextField fx:id="emailField" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Email *" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                                    </VBox>
+                                </HBox>
+                                <HBox spacing="15.0">
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <StackPane styleClass="input-group">
+                                            <TextField fx:id="idNumberField" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Số CMND/CCCD *" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                              <Label fx:id="idNumberErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <StackPane styleClass="input-group">
+                                            <TextField fx:id="taxCodeField" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Mã số thuế" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                                    </VBox>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="15.0" styleClass="form-card">
+                            <children>
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #8E2424;" text="ĐỊA CHỈ THƯỜNG TRÚ" />
+                                <VBox spacing="5.0">
+                                    <StackPane styleClass="input-group">
+                                        <TextField fx:id="addressField" styleClass="modern-input" />
+                                        <Label styleClass="input-label" text="Địa chỉ chi tiết hoặc theo VNeID" StackPane.alignment="TOP_LEFT" />
+                                    </StackPane>
+                                </VBox>
+                                <HBox spacing="15.0">
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <StackPane styleClass="input-group">
+                                            <ComboBox fx:id="provinceCombo" maxWidth="Infinity" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Tỉnh/Thành phố *" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                              <Label fx:id="provinceErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <StackPane styleClass="input-group">
+                                            <ComboBox fx:id="districtCombo" maxWidth="Infinity" styleClass="modern-input" />
+                                            <Label styleClass="input-label" text="Phường/Xã *" StackPane.alignment="TOP_LEFT" />
+                                        </StackPane>
+                              <Label fx:id="districtErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                    </VBox>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0" styleClass="form-card">
+                            <children>
+                                <Label style="-fx-font-weight: bold;" text="Ảnh Căn cước/CCCD * " />
+                                <HBox spacing="20.0">
+                           <VBox alignment="CENTER" spacing="8.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                          <VBox fx:id="frontImageBox" alignment="CENTER" onMouseClicked="#handleUploadFront" prefHeight="160.0" spacing="5.0" styleClass="upload-box">
+                                              <ImageView fx:id="frontImageView" fitHeight="30.0" fitWidth="30.0" opacity="0.6">
+                                                  <image>
+                                          <Image url="@../images/image-up.png" />
+                                       </image>
+                                              </ImageView>
+                                              <Label text="Tải ảnh lên mặt trước" />
+                                          </VBox>
+                                 <Label fx:id="frontImageErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                              </children>
+                           </VBox>
+                           <VBox alignment="CENTER" spacing="8.0" HBox.hgrow="ALWAYS">
+                              <children>
+                                          <VBox fx:id="backImageBox" alignment="CENTER" onMouseClicked="#handleUploadBack" prefHeight="160.0" spacing="5.0" styleClass="upload-box">
+                                              <ImageView fx:id="backImageView" fitHeight="30.0" fitWidth="30.0" opacity="0.6">
+                                                  <image>
+                                          <Image url="@../images/image-up.png" />
+                                       </image>
+                                              </ImageView>
+                                              <Label text="Tải ảnh lên mặt sau" />
+                                          </VBox>
+                                 <Label fx:id="backImageErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                              </children>
+                           </VBox>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                            <children>
+                                <Label fx:id="statusLabel" styleClass="status-label" visible="false" />
+                                <Button onAction="#handleSaveProfile" prefHeight="50.0" prefWidth="180.0" styleClass="primary-btn" text="Lưu thông tin" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+   </center>
+</BorderPane>

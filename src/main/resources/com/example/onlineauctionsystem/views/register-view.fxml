@@ -3,137 +3,110 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fx:id="mainScrollPane" fitToWidth="true" prefWidth="850.0" style="-fx-background-color: white;" stylesheets="@../css/login-view.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.RegisterController">
-
-    <VBox spacing="25.0" style="-fx-background-color: white;">
-        <padding><Insets bottom="40.0" left="80.0" right="80.0" top="40.0" /></padding>
-
-        <VBox alignment="CENTER" spacing="5.0">
-            <Label style="-fx-font-size: 26px; -fx-font-weight: bold;" text="Đăng ký tài khoản" />
-            <HBox alignment="CENTER" spacing="5.0">
-                <Label style="-fx-font-size: 14px;" text="Bạn đã có tài khoản?" />
-                <Hyperlink onAction="#handleGoToLogin" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333; -fx-underline: false;" text="Đăng Nhập Ngay" />
-            </HBox>
-        </VBox>
-
-        <VBox spacing="10.0">
-            <Label text="Loại tài khoản" />
-            <HBox spacing="100.0">
-                <RadioButton fx:id="individualRadio" selected="true" text="Cá nhân">
-                    <toggleGroup><ToggleGroup fx:id="accountTypeGroup" /></toggleGroup>
-                </RadioButton>
-                <RadioButton fx:id="organizationRadio" text="Tổ chức" toggleGroup="$accountTypeGroup" />
-            </HBox>
-        </VBox>
-
-        <VBox spacing="10.0">
-            <Label text="Mục đích tham gia (Vai trò)" />
-            <ComboBox fx:id="roleComboBox" prefHeight="45.0" prefWidth="Infinity" promptText="Chọn vai trò của bạn" styleClass="text-field" />
-        </VBox>
-
-        <HBox spacing="15.0">
-            <TextField prefHeight="45.0" promptText="Họ" HBox.hgrow="ALWAYS" />
-            <TextField prefHeight="45.0" promptText="Tên đệm" HBox.hgrow="ALWAYS" />
-            <TextField prefHeight="45.0" promptText="Tên" HBox.hgrow="ALWAYS" />
-        </HBox>
-
-        <TextField fx:id="usernameField" prefHeight="45.0" promptText="Tên đăng nhập" />
-
-        <VBox spacing="10.0">
-            <PasswordField fx:id="passwordField" prefHeight="45.0" promptText="Mật khẩu" />
-            <HBox spacing="15.0" style="-fx-background-color: #fafafa; -fx-padding: 10;">
-                <Label fx:id="lengthHint" styleClass="label-hint" text="✔ Tối thiểu 8 ký tự" />
-                <Label fx:id="upperHint" styleClass="label-hint" text="✔ Chứa ký tự viết hoa" />
-                <Label fx:id="numberHint" styleClass="label-hint" text="✔ Chứa số" />
-                <Label fx:id="specialHint" styleClass="label-hint" text="✔ Chứa ký tự đặc biệt" />
-            </HBox>
-        </VBox>
-
-        <PasswordField fx:id="confirmPasswordField" prefHeight="45.0" promptText="Nhập lại mật khẩu" />
-
-        <HBox spacing="15.0">
-            <TextField fx:id="emailField" prefHeight="45.0" promptText="Nhập địa chỉ Email" HBox.hgrow="ALWAYS" />
-            <TextField fx:id="phoneField" prefHeight="45.0" promptText="Nhập số điện thoại" HBox.hgrow="ALWAYS" />
-            <VBox><Label styleClass="label-hint" text="Giới tính" /><ComboBox maxWidth="1.7976931348623157E308" prefHeight="45.0" prefWidth="200.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" /></VBox>
-        </HBox>
-
-        <HBox spacing="15.0">
-            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                <Label style="-fx-text-fill: #9e9e9e; -fx-font-size: 13px;" text="Ngày sinh" />
-                <ComboBox fx:id="dayComboBox" maxWidth="Infinity" prefHeight="45.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" />
+<VBox alignment="TOP_CENTER" prefWidth="500.0" spacing="20.0" style="-fx-background-color: white;" stylesheets="@../css/register-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.RegisterController">
+   <padding>
+      <Insets bottom="40.0" left="40.0" right="40.0" top="30.0" />
+   </padding>
+   <children>
+      <VBox alignment="CENTER_LEFT" spacing="5.0">
+         <children>
+            <Label styleClass="header-title" text="Đăng ký tài khoản" />
+            <Label styleClass="header-subtitle" text="Tạo tài khoản để tham gia đấu giá và quản lý giao dịch" />
+         </children>
+      </VBox>
+      <HBox minHeight="50.0" prefHeight="50.0" styleClass="toggle-container">
+         <children>
+            <Button fx:id="btnSeller" maxWidth="1.7976931348623157E308" minHeight="40.0" mnemonicParsing="false" onAction="#handleToggleRole" prefHeight="40.0" styleClass="toggle-btn-active" text="Bidder" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnBidder" maxWidth="1.7976931348623157E308" minHeight="40.0" mnemonicParsing="false" onAction="#handleToggleRole" prefHeight="40.0" styleClass="toggle-btn-inactive" text="Seller" HBox.hgrow="ALWAYS" />
+         </children>
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </VBox.margin>
+      </HBox>
+      <VBox spacing="15.0">
+         <children>
+            <VBox spacing="2.0">
+               <children>
+                  <StackPane styleClass="input-group">
+                     <children>
+                        <TextField fx:id="usernameField" promptText="Nhập thông tin" styleClass="modern-input" />
+                        <Label styleClass="input-label" text="Họ và tên" StackPane.alignment="TOP_LEFT" />
+                     </children>
+                  </StackPane>
+                  <Label fx:id="nameErrorLabel" managed="false" styleClass="error-text" visible="false" />
+               </children>
             </VBox>
-
-            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                <Label style="-fx-text-fill: #9e9e9e; -fx-font-size: 13px;" text="Tháng sinh" />
-                <ComboBox fx:id="monthComboBox" maxWidth="Infinity" prefHeight="45.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" />
+            <VBox spacing="2.0">
+               <children>
+                  <StackPane styleClass="input-group">
+                     <children>
+                        <TextField fx:id="emailField" promptText="Nhập thông tin" styleClass="modern-input" />
+                        <Label styleClass="input-label" text="Email" StackPane.alignment="TOP_LEFT" />
+                     </children>
+                  </StackPane>
+                  <Label fx:id="emailErrorLabel" managed="false" styleClass="error-text" visible="false" />
+               </children>
             </VBox>
-
-            <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                <Label style="-fx-text-fill: #9e9e9e; -fx-font-size: 13px;" text="Năm sinh" />
-                <ComboBox fx:id="yearComboBox" maxWidth="Infinity" prefHeight="45.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" />
+            <VBox spacing="2.0">
+               <children>
+                  <StackPane styleClass="input-group">
+                     <children>
+                        <TextField fx:id="phoneField" promptText="Nhập thông tin" styleClass="modern-input" />
+                        <Label styleClass="input-label" text="Số điện thoại" StackPane.alignment="TOP_LEFT" />
+                     </children>
+                  </StackPane>
+                  <Label fx:id="phoneErrorLabel" managed="false" styleClass="error-text" visible="false" />
+               </children>
             </VBox>
-        </HBox>
-
-        <HBox spacing="15.0">
-            <VBox spacing="15.0" HBox.hgrow="ALWAYS"><Label styleClass="label-hint" text="Tỉnh/Thành phố" /><ComboBox fx:id="provinceComboBox" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" /></VBox>
-            <VBox spacing="15.0" HBox.hgrow="ALWAYS"><Label styleClass="label-hint" text="Quận/Huyện" /><ComboBox fx:id="districtComboBox" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" /></VBox>
-            <VBox spacing="15.0" HBox.hgrow="ALWAYS"><Label styleClass="label-hint" text="Xã/Phường" /><ComboBox fx:id="wardComboBox" maxWidth="1.7976931348623157E308" prefHeight="45.0" promptText="Chọn" style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-radius: 4px;" /></VBox>
-        </HBox>
-        <TextField prefHeight="45.0" promptText="Địa chỉ chi tiết" />
-
-        <HBox spacing="15.0">
-            <TextField prefHeight="45.0" promptText="CMND/CCCD" HBox.hgrow="ALWAYS" />
-            <DatePicker prefHeight="45.0" promptText="Ngày cấp" HBox.hgrow="ALWAYS" />
-            <TextField prefHeight="45.0" promptText="Nơi cấp" HBox.hgrow="ALWAYS" />
-        </HBox>
-
-        <HBox alignment="CENTER" spacing="20.0">
-            <VBox fx:id="frontIdBox" alignment="CENTER" prefHeight="140.0" spacing="10.0" styleClass="upload-box" HBox.hgrow="ALWAYS">
-            <ImageView fx:id="frontImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/id_card_front.jpg" />
-               </image>
-            </ImageView>
-                <Label fx:id="frontIdLabel" style="-fx-font-weight: bold;" text="Tải lên ảnh mặt trước CMND/CCCD" />
-                <Label styleClass="label-hint" text="(JPG, PNG kích thước nhỏ hơn 10MB)" />
+            <VBox spacing="5.0">
+               <children>
+                  <StackPane styleClass="input-group">
+                     <children>
+                        <PasswordField fx:id="passwordField" promptText="**********" styleClass="modern-input" />
+                        <Label styleClass="input-label" text="Mật khẩu" StackPane.alignment="TOP_LEFT" />
+                        <Button mnemonicParsing="false" styleClass="eye-btn" text="👁" StackPane.alignment="CENTER_RIGHT" />
+                     </children>
+                  </StackPane>
+                  <Label fx:id="passwordErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                  <Label styleClass="hint-text" text="Mật khẩu phải có độ dài từ 8 đến 16 ký tự và chứa ký tự hoa, ký tự thường, ký tự số, ký tự đặc biệt" wrapText="true" />
+               </children>
             </VBox>
-
-            <VBox fx:id="backIdBox" alignment="CENTER" prefHeight="140.0" spacing="10.0" styleClass="upload-box" HBox.hgrow="ALWAYS">
-            <ImageView fx:id="backImageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../images/id_card_back.jpg" />
-               </image>
-            </ImageView>
-                <Label fx:id="backIdLabel" style="-fx-font-weight: bold;" text="Tải lên ảnh mặt sau CMND/CCCD" />
-                <Label styleClass="label-hint" text="(JPG, PNG kích thước nhỏ hơn 10MB)" />
+            <VBox spacing="2.0">
+               <children>
+                  <StackPane styleClass="input-group">
+                     <children>
+                        <PasswordField fx:id="confirmPasswordField" promptText="**********" styleClass="modern-input" />
+                        <Label styleClass="input-label" text="Xác nhận mật khẩu" StackPane.alignment="TOP_LEFT" />
+                        <Button mnemonicParsing="false" styleClass="eye-btn" text="👁" StackPane.alignment="CENTER_RIGHT" />
+                     </children>
+                  </StackPane>
+                  <Label fx:id="confirmPasswordErrorLabel" managed="false" styleClass="error-text" visible="false" />
+               </children>
             </VBox>
-        </HBox>
-
-        <TextField prefHeight="45.0" promptText="Số tài khoản ngân hàng" />
-        <VBox>
-            <Label styleClass="label-hint" text="Tên ngân hàng" />
-            <ComboBox fx:id="bankComboBox" prefHeight="45.0" prefWidth="Infinity" promptText="Chọn" />
-        </VBox>
-        <TextField prefHeight="45.0" promptText="Chi nhánh ngân hàng" />
-        <TextField prefHeight="45.0" promptText="Tên chủ tài khoản" />
-
-        <CheckBox fx:id="termsCheckBox" style="-fx-font-size: 13px; -fx-padding: 10 0 10 0;" text="Tôi cam kết tuân thủ Quyền và trách nhiệm của Người tham gia đấu giá, Chính sách bảo mật thông tin khách hàng, Cơ chế giải quyết tranh chấp, Quy chế hoạt động tại website đấu giá trực tuyến." wrapText="true" />
-
-        <Button onAction="#handleRegister" prefHeight="55.0" prefWidth="Infinity" styleClass="btn-primary" text="ĐĂNG KÝ TÀI KHOẢN" />
-
-    </VBox>
-</ScrollPane>
+         </children>
+      </VBox>
+      <CheckBox fx:id="termsCheckBox" alignment="TOP_LEFT" mnemonicParsing="false" styleClass="terms-checkbox" text="Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật" wrapText="true">
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
+      </CheckBox>
+      <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRegister" prefHeight="50.0" styleClass="register-btn" text="Đăng ký" VBox.vgrow="ALWAYS" />
+      <HBox alignment="CENTER" spacing="5.0">
+         <padding>
+            <Insets top="15.0" />
+         </padding>
+         <children>
+            <Label styleClass="login-hint" text="Đã có tài khoản?" />
+            <Hyperlink onAction="#handleGoToLogin" styleClass="login-link" text="Đăng nhập" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

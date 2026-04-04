@@ -1,6 +1,7 @@
 package com.example.onlineauctionsystem.controllers;
 
 import com.example.onlineauctionsystem.models.AutoBid;
+import com.example.onlineauctionsystem.models.BidTransaction;
 import com.example.onlineauctionsystem.models.Item;
 import com.example.onlineauctionsystem.models.User;
 import com.example.onlineauctionsystem.services.ItemService;
@@ -12,23 +13,31 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemDetailsController implements AuctionObserver {
     @FXML private Label titleLabel;
     @FXML private Label descLabel;
     @FXML private Label startPriceLabel;
     @FXML private Label currentBidLabel;
-    @FXML private Label currentWinnerLabel;
-
     @FXML private Label statusLabel;
 
     @FXML private Label dayLabel;
@@ -38,10 +47,11 @@ public class ItemDetailsController implements AuctionObserver {
 
     @FXML private TextField bidAmountField;
     @FXML private Button bidButton;
-
     @FXML private Label modeIndicatorLabel;
-    private boolean isAutoMode = false;
 
+    @FXML private VBox bidHistoryContainer;
+
+    private boolean isAutoMode = false;
     private Item currentItem;
     private User currentUser;
     private Timeline timeline;
@@ -49,61 +59,134 @@ public class ItemDetailsController implements AuctionObserver {
     public void initData(Item item, User user) {
         this.currentItem = item;
         this.currentUser = user;
+
+        List<BidTransaction> history = ItemService.loadHistoryForItem(item.getId());
+        item.setBidHistory(history);
+        if (!history.isEmpty()) {
+            BidTransaction latest = history.get(history.size() - 1);
+            item.setCurrentHighestBid(latest.getBidAmount());
+            item.setCurrentWinnerId(latest.getBidderId());
+        }
+
         titleLabel.setText(item.getName());
         descLabel.setText(item.getDescription());
         startPriceLabel.setText(String.format("$%,.0f", item.getStartingPrice()));
+
         checkExistingAutoMode();
-        updateCurrentBidDisplay();
+        updateUI();
         startCountdownTimer();
         ItemService.addObserver(this);
         setupCloseRequest();
     }
 
+    private void updateUI() {
+        updateCurrentBidDisplay();
+        updateBidHistory();
+    }
+
     @Override
     public void onAuctionUpdate() {
         Platform.runLater(() -> {
-            updateCurrentBidDisplay();
+            updateUI();
         });
     }
 
-    private void checkExistingAutoMode() {
-        boolean found = false;
-        for (AutoBid ab: currentItem.getAutoBids()) {
-            if (ab.getUserId().equals(currentUser.getId())) {
-                found = true;
-                break;
-            }
+    private void updateBidHistory() {
+        bidHistoryContainer.getChildren().clear();
+        List<BidTransaction> allTransactions = currentItem.getBidHistory();
+        if (allTransactions == null || allTransactions.isEmpty()) {
+            return;
         }
-        this.isAutoMode = found;
-        updateModeUI();
+
+        List<BidTransaction> top3 = allTransactions.stream()
+                .sorted((b1, b2) -> Double.compare(b2.getBidAmount(), b1.getBidAmount()))
+                .limit(3)
+                .collect(Collectors.toList());
+
+        for (BidTransaction tx: top3) {
+            bidHistoryContainer.getChildren().add(createHistoryRow(tx));
+        }
+    }
+
+    private HBox createHistoryRow(BidTransaction tx) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(5, 0, 5, 0));
+
+        Label price = new Label(String.format("$%,.0f", tx.getBidAmount()));
+        price.setStyle("-fx-font-weight: bold; -fx-text-fill: #2ecc71; -fx-font-size: 14px;");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        String rawName =  "VN-" + tx.getBidderId().substring(0, 6).toUpperCase();
+        boolean isMe = tx.getBidderId().equals(currentUser.getId());
+        Label user = new Label(isMe ? "(Bạn) " + rawName : rawName);
+        if (isMe) {
+            user.setStyle("-fx-text-fill: #2980b9; -fx-font-weight: bold;");
+        } else {
+            user.setStyle("-fx-text-fill: #34495e; -fx-font-weight: bold");
+        }
+        Label time = new Label(tx.getFormattedTime());
+        time.setStyle("-fx-text-fill: #bdc3c7; -fx-font-size: 10px; -fx-font-weight: bold;");
+
+        row.getChildren().addAll(price, spacer, user, time);
+        return row;
+    }
+
+    @FXML
+    private void handleViewAllTransactions() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/onlineauctionsystem/views/all-transactions.fxml"));
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
+            stage.setTitle("Lịch sử giao dịch - " + currentItem.getName());
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            AllTransactionsController controller = loader.getController();
+            controller.setData(currentItem.getBidHistory(), currentUser);
+
+            stage.setResizable(false);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    protected void handlePlaceBid(ActionEvent event) {
+        String inputStr = bidAmountField.getText();
+        if (inputStr == null || inputStr.trim().isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Lỗi", "Vui lòng nhập số tiền bạn muốn đấu giá!");
+            return ;
+        }
+        try {
+            double bidAmount = Double.parseDouble(inputStr);
+            String resultMsg;
+            if (isAutoMode) {
+                resultMsg = ItemService.registerAutoBid(currentItem.getId(), currentUser.getId(), bidAmount);
+            } else {
+                resultMsg = ItemService.placeBid(currentItem.getId(), currentUser.getId(), bidAmount);
+            }
+            if (resultMsg.equals("SUCCESS")) {
+                bidAmountField.clear();
+                if (isAutoMode) {
+                    showAlert(Alert.AlertType.INFORMATION, "Ủy quyền thành công",
+                            "Hệ thống đã nhận Max Bid $" + bidAmount + ". Chúng tôi sẽ tự động đấu giá thay bạn!");
+                } else {
+                    showAlert(Alert.AlertType.INFORMATION, "Thành công",
+                            "Bạn đã vươn lên dẫn đầu với mức giá $" + bidAmount + "!");
+                }
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Không hợp lệ", resultMsg);
+            }
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", "Vui lòng chỉ nhập số (Không nhập chữ hoặc ký tự đặc biệt)!");
+        }
     }
 
     private void updateCurrentBidDisplay() {
         currentBidLabel.setText(String.format("$%,.0f", currentItem.getCurrentHighestBid()));
-        String winnerId = currentItem.getCurrentWinnerId();
-        if (winnerId == null || winnerId.equals("NONE")) {
-            if (currentWinnerLabel != null) {
-                currentWinnerLabel.setText("Chưa có ai");
-            }
-        } else {
-            User winner = UserService.getUserById(winnerId);
-            if (winner != null && currentWinnerLabel != null) {
-                String username = winner.getUsername();
-                String maskedName;
-                if (username.length() <= 3) {
-                    maskedName = username.substring(0, 1) + "***";
-                } else {
-                    maskedName = username.substring(0, 3) + "***";
-                }
-                if (winnerId.equals(currentUser.getId())) {
-                    currentWinnerLabel.setText("Bạn (Đang dẫn đầu)");
-                    currentWinnerLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
-                } else {
-                    currentWinnerLabel.setText(maskedName);
-                    currentWinnerLabel.setStyle("-fx-text-fill: #e67e22; -fx-font-weight: bold;");
-                }
-            }
-        }
     }
 
     private void startCountdownTimer() {
@@ -159,39 +242,6 @@ public class ItemDetailsController implements AuctionObserver {
     }
 
     @FXML
-    protected void handlePlaceBid(ActionEvent event) {
-        String inputStr = bidAmountField.getText();
-        if (inputStr == null || inputStr.trim().isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Lỗi", "Vui lòng nhập số tiền bạn muốn đấu giá!");
-            return ;
-        }
-        try {
-            double bidAmount = Double.parseDouble(inputStr);
-            String resultMsg;
-            if (isAutoMode) {
-                resultMsg = ItemService.registerAutoBid(currentItem.getId(), currentUser.getId(), bidAmount);
-            } else {
-                resultMsg = ItemService.placeBid(currentItem.getId(), currentUser.getId(), bidAmount);
-            }
-            if (resultMsg.equals("SUCCESS")) {
-                updateCurrentBidDisplay();
-                bidAmountField.clear();
-                if (isAutoMode) {
-                    showAlert(Alert.AlertType.INFORMATION, "Ủy quyền thành công",
-                            "Hệ thống đã nhận Max Bid $" + bidAmount + ". Chúng tôi sẽ tự động đấu giá thay bạn!");
-                } else {
-                    showAlert(Alert.AlertType.INFORMATION, "Thành công",
-                            "Bạn đã vươn lên dẫn đầu với mức giá $" + bidAmount + "!");
-                }
-            } else {
-                showAlert(Alert.AlertType.WARNING, "Không hợp lệ", resultMsg);
-            }
-        } catch (NumberFormatException e) {
-            showAlert(Alert.AlertType.ERROR, "Lỗi định dạng", "Vui lòng chỉ nhập số (Không nhập chữ hoặc ký tự đặc biệt)!");
-        }
-    }
-
-    @FXML
     protected void handleIncreaseBid() {
         try {
             double currentVal = Double.parseDouble(bidAmountField.getText());
@@ -236,6 +286,18 @@ public class ItemDetailsController implements AuctionObserver {
             modeIndicatorLabel.setStyle("-fx-text-fill: #95a5a6; -fx-font-weight: bold; " +
                     "-fx-background-color: #f2f4f4; -fx-padding: 3 8 3 8; -fx-background-radius: 10;");
         }
+    }
+
+    private void checkExistingAutoMode() {
+        boolean found = false;
+        for (AutoBid ab: currentItem.getAutoBids()) {
+            if (ab.getUserId().equals(currentUser.getId())) {
+                found = true;
+                break;
+            }
+        }
+        this.isAutoMode = found;
+        updateModeUI();
     }
 
     private void cleanup() {

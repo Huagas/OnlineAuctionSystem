@@ -1,15 +1,8 @@
 package com.example.onlineauctionsystem.models;
 
 public class Admin extends User {
-    private int accessLevel;
-
-    public Admin(String username, String password, String email, String phone, String accountType, int accessLevel) {
-        super(username, password, email, phone, accountType);
-        this.accessLevel = accessLevel;
-    }
-
-    public int getAccessLevel() {
-        return accessLevel;
+    public Admin(String username, String password, String email, String phone) {
+        super(username, password, email, phone);
     }
 
     @Override
@@ -19,6 +12,6 @@ public class Admin extends User {
 
     @Override
     public void printInfo() {
-        System.out.println("[ADMIN] ID: " + this.id + " | User: " + this.username + " | AccessLevel: " + this.accessLevel);
+        System.out.println("[ADMIN] ID: " + this.id + " | User: " + this.username);
     }
 }

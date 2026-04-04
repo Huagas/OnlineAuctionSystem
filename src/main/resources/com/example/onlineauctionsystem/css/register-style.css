@@ -1,0 +1,141 @@
+.header-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.header-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7f8c8d;
+}
+
+.toggle-container {
+    -fx-background-color: #f4f4f4;
+    -fx-background-radius: 10;
+}
+
+.toggle-btn-active {
+    -fx-background-color: #8E2424;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+}
+
+.toggle-btn-inactive {
+    -fx-background-color: transparent;
+    -fx-text-fill: #333;
+}
+
+.input-group {
+    -fx-padding: 10 0 0 0;
+}
+
+.input-label {
+    -fx-background-color: white;
+    -fx-translate-y: -10;
+    -fx-translate-x: 15;
+    -fx-padding: 0 5 0 5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.modern-input {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+
+    -fx-pref-height: 45;
+    -fx-min-height: 45;
+    -fx-padding: 0 15 0 15;
+}
+
+.modern-input:focused {
+    -fx-border-color: #8E2424;
+    -fx-border-width: 1.5;
+}
+
+.eye-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #95a5a6;
+    -fx-cursor: hand;
+    -fx-padding: 0 15 0 0;
+}
+
+.hint-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #95a5a6;
+}
+
+.terms-checkbox {
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
+    -fx-cursor: hand;
+    -fx-label-padding: 0 0 0 10;
+}
+
+.terms-checkbox .box {
+    -fx-background-color: white;
+    -fx-border-color: #dcdde1;
+    -fx-border-radius: 3;
+}
+
+.terms-checkbox:selected .mark {
+    -fx-background-color: #8E2424;
+}
+
+.register-btn {
+    -fx-background-color: #8E2424;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.register-btn:hover {
+    -fx-background-color: #a02d2d;
+}
+
+.login-hint {
+    -fx-text-fill: #7f8c8d;
+    -fx-font-size: 14px;
+}
+
+.login-link {
+    -fx-text-fill: #8E2424;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-underline: false;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.login-link:hover {
+    -fx-text-fill: #a02d2d;
+    -fx-underline: true;
+}
+
+.login-link:visited {
+    -fx-text-fill: #8E2424;
+}
+
+.login-link:armed {
+    -fx-background-color: transparent;
+}
+
+.error-text {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+    -fx-padding: 0 0 0 5;
+}
+
+.modern-input-error {
+    -fx-border-color: #e74c3c !important;
+    -fx-border-width: 1.5;
+}
+
+.terms-checkbox-error .box {
+    -fx-border-color: #e74c3c;
+}

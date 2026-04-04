@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-pane" stylesheets="@../css/global.css, @../css/bidder-dashboard.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.BidderDashboardController">
+<BorderPane prefHeight="800.0" prefWidth="1280.0" styleClass="root-pane" stylesheets="@../css/global-style.css, @../css/bidder-dashboard-style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.BidderDashboardController">
 
    <top>
       <VBox BorderPane.alignment="CENTER">
