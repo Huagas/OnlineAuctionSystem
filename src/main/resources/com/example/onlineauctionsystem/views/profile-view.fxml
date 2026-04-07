@@ -4,6 +4,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -16,7 +17,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="980.0" prefWidth="1280.0" styleClass="root-container" stylesheets="@../css/profile-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.ProfileController">
+<BorderPane prefHeight="900.0" prefWidth="1280.0" styleClass="root-container" stylesheets="@../css/profile-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.onlineauctionsystem.controllers.ProfileController">
     <left>
         <VBox prefWidth="280.0" spacing="10.0" styleClass="sidebar">
             <padding><Insets bottom="20.0" left="15.0" right="15.0" top="40.0" /></padding>
@@ -139,7 +140,33 @@
 
                         <VBox spacing="10.0" styleClass="form-card">
                             <children>
-                                <Label style="-fx-font-weight: bold;" text="Ảnh Căn cước/CCCD * " />
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #8E2424;" text="CMND/CCCD * " />
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <StackPane styleClass="input-group">
+                                       <children>
+                                          <DatePicker fx:id="idIssueDatePicker" maxWidth="Infinity" styleClass="modern-input" />
+                                          <Label styleClass="input-label" text="Ngày cấp *" StackPane.alignment="TOP_LEFT" />
+                                       </children>
+                                    </StackPane>
+                                    <Label fx:id="idIssueDateErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <StackPane styleClass="input-group">
+                                       <children>
+                                          <ComboBox fx:id="idIssuePlaceCombo" maxWidth="Infinity" styleClass="modern-input" />
+                                          <Label styleClass="input-label" text="Nơi cấp *" StackPane.alignment="TOP_LEFT" />
+                                       </children>
+                                    </StackPane>
+                                    <Label fx:id="idIssuePlaceErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
                                 <HBox spacing="20.0">
                            <VBox alignment="CENTER" spacing="8.0" HBox.hgrow="ALWAYS">
                               <children>
@@ -170,6 +197,48 @@
                                 </HBox>
                             </children>
                         </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" styleClass="form-card">
+                     <children>
+                        <Label style="-fx-font-weight: bold; -fx-text-fill: #8E2424;" text="Thông tin ngân hàng" />
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <StackPane styleClass="input-group">
+                                       <children>
+                                          <TextField fx:id="bankAccountNameField" styleClass="modern-input" />
+                                          <Label styleClass="input-label" text="Chủ tài khoản *" StackPane.alignment="TOP_LEFT" />
+                                       </children>
+                                    </StackPane>
+                                    <Label fx:id="bankAccountNameErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <StackPane styleClass="input-group">
+                                       <children>
+                                          <TextField fx:id="bankAccountNumberField" styleClass="modern-input" />
+                                          <Label styleClass="input-label" text="Số tài khoản ngân hàng *" StackPane.alignment="TOP_LEFT" />
+                                       </children>
+                                    </StackPane>
+                                    <Label fx:id="bankAccountNumberErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                        <VBox spacing="5.0">
+                           <children>
+                              <StackPane styleClass="input-group">
+                                 <children>
+                                    <ComboBox fx:id="bankNameCombo" maxWidth="Infinity" styleClass="modern-input" />
+                                    <Label styleClass="input-label" text="Chọn ngân hàng *" StackPane.alignment="TOP_LEFT" />
+                                 </children>
+                              </StackPane>
+                              <Label fx:id="bankNameErrorLabel" managed="false" styleClass="error-text" visible="false" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15.0">
                             <children>

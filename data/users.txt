@@ -1,3 +1,0 @@
-Admin,5396eec9-3338-4d09-a779-f01792e62374,2026-04-04T01:10:02.596345800,admin,123,admin@gmail.com,0853315868,,,,,,false,,
-Bidder,925ee83b-e399-4693-9311-7103d7ea853a,2026-04-04T01:10:02.596345800,nguyenvana,123,vana@gmail.com,0901234567,026207000038,FXLO9012,,Hà Nội,Hoàn Kiếm,true,nguyenvana_front.png,nguyenvana_back.png,0.0
-Seller,3bfde74b-7800-442a-8e90-0a9e4ce7a1a7,2026-04-04T01:10:02.596345800,cty_thanhly,123,contact@thanhly.vn,0243123456,,,,,,false,,,0.0

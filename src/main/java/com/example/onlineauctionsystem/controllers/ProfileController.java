@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.regex.Pattern;
 
 public class ProfileController {
@@ -35,12 +36,22 @@ public class ProfileController {
     @FXML private TextField addressField;
 
     @FXML private ComboBox<String> provinceCombo, districtCombo;
+    @FXML private DatePicker idIssueDatePicker;
+    @FXML private ComboBox<String> idIssuePlaceCombo;
+    @FXML private TextField bankAccountNameField;
+    @FXML private TextField bankAccountNumberField;
+    @FXML private ComboBox<String> bankNameCombo;
 
     @FXML private Label idNumberErrorLabel;
     @FXML private Label provinceErrorLabel;
     @FXML private Label districtErrorLabel;
+    @FXML private Label idIssueDateErrorLabel;
+    @FXML private Label idIssuePlaceErrorLabel;
     @FXML private Label frontImageErrorLabel;
     @FXML private Label backImageErrorLabel;
+    @FXML private Label bankAccountNameErrorLabel;
+    @FXML private Label bankAccountNumberErrorLabel;
+    @FXML private Label bankNameErrorLabel;
 
     @FXML private VBox frontImageBox, backImageBox;
     @FXML private ImageView frontImageView, backImageView;
@@ -58,6 +69,8 @@ public class ProfileController {
     public void initialize() {
         provinceCombo.setItems(FXCollections.observableArrayList("Hà Nội", "Hải Phòng", "Đà Nẵng", "TP. Hồ Chí Minh"));
         districtCombo.setItems(FXCollections.observableArrayList("Quận 1", "Quận 3", "Hoàn Kiếm", "Hải An"));
+        idIssuePlaceCombo.getItems().addAll("Cục CSQLHC về TTXH", "Công an TP Hà Nội", "Công an TP Hồ Chí Minh");
+        bankNameCombo.getItems().addAll("Vietcombank", "Techcombank", "MB Bank", "BIDV", "Agribank", "TPBank");
 
         setupValidationListeners();
     }
@@ -75,6 +88,15 @@ public class ProfileController {
 
             provinceCombo.setValue(user.getProvince());
             districtCombo.setValue(user.getDistrict());
+
+            idIssuePlaceCombo.setValue(user.getIdIssuePlace());
+            if (user.getIdIssueDate() != null && !user.getIdIssueDate().isEmpty()) {
+                idIssueDatePicker.setValue(LocalDate.parse(user.getIdIssueDate()));
+            }
+
+            bankAccountNameField.setText(user.getBankAccountName());
+            bankAccountNumberField.setText(user.getBankAccountNumber());
+            bankNameCombo.setValue(user.getBankName());
 
             loadSavedImage(currentUser.getFrontIdPath(), frontImageView);
             loadSavedImage(currentUser.getBackIdPath(), backImageView);
@@ -99,6 +121,11 @@ public class ProfileController {
             currentUser.setAddress(addressField.getText());
             currentUser.setProvince(provinceCombo.getValue());
             currentUser.setDistrict(districtCombo.getValue());
+            currentUser.setIdIssueDate(idIssueDatePicker.getValue() != null ? idIssueDatePicker.getValue().toString() : "");
+            currentUser.setIdIssuePlace(idIssuePlaceCombo.getValue());
+            currentUser.setBankAccountName(bankAccountNameField.getText());
+            currentUser.setBankAccountNumber(bankAccountNumberField.getText());
+            currentUser.setBankName(bankNameCombo.getValue());
 
             if (frontIdFile != null) {
                 String frontName = saveImageToLocalFolder(frontIdFile, "front");
@@ -163,7 +190,7 @@ public class ProfileController {
     private boolean validateForm() {
         boolean isValid = true;
 
-        if (idNumberField.getText().trim().isEmpty()) {
+        if (idNumberField.getText() == null || idNumberField.getText().trim().isEmpty()) {
             showError(idNumberField, idNumberErrorLabel, "Số CMND/CCCD không được để trống.");
             isValid = false;
         } else {
@@ -184,6 +211,20 @@ public class ProfileController {
             clearError(districtCombo, districtErrorLabel);
         }
 
+        if (idIssueDatePicker.getValue() == null) {
+            showError(idIssueDatePicker, idIssueDateErrorLabel, "Vui lòng không để trống trường ngày cấp CMND/CCCD.");
+            isValid = false;
+        } else {
+            clearError(idIssueDatePicker, idIssueDateErrorLabel);
+        }
+
+        if (idIssuePlaceCombo.getValue() == null) {
+            showError(idIssuePlaceCombo, idIssuePlaceErrorLabel, "Vui lòng không để trống trường nơi cấp CMND/CCCD.");
+            isValid = false;
+        } else {
+            clearError(idIssuePlaceCombo, idIssuePlaceErrorLabel);
+        }
+
         if (frontIdFile == null) {
             showError(frontImageBox, frontImageErrorLabel, "Vui lòng tải lên ảnh mặt trước CMND/CCCD.");
             isValid = false;
@@ -196,6 +237,27 @@ public class ProfileController {
             isValid = false;
         } else {
             clearError(backImageBox, backImageErrorLabel);
+        }
+
+        if (bankAccountNameField.getText() == null || bankAccountNameField.getText().trim().isEmpty()) {
+            showError(bankAccountNameField, bankAccountNameErrorLabel, "Vui lòng không để trống trường Chủ tài khoản.");
+            isValid = false;
+        } else {
+            clearError(bankAccountNameField, bankAccountNameErrorLabel);
+        }
+
+        if (bankAccountNumberField.getText() == null || bankAccountNumberField.getText().trim().isEmpty()) {
+            showError(bankAccountNumberField, bankAccountNumberErrorLabel, "Vui lòng không để trống trường Số tài khoản ngân hàng.");
+            isValid = false;
+        } else {
+            clearError(bankAccountNumberField, bankAccountNumberErrorLabel);
+        }
+
+        if (bankNameCombo.getValue() == null) {
+            showError(bankNameCombo, bankNameErrorLabel, "Vui lòng không để trống trường Chọn ngân hàng.");
+            isValid = false;
+        } else {
+            clearError(bankNameCombo, bankNameErrorLabel);
         }
 
         return isValid;
@@ -267,5 +329,11 @@ public class ProfileController {
         idNumberField.textProperty().addListener((obs, old, newValue) -> clearError(idNumberField, idNumberErrorLabel));
         provinceCombo.valueProperty().addListener((obs, old, newValue) -> clearError(provinceCombo, provinceErrorLabel));
         districtCombo.valueProperty().addListener((obs, old, newValue) -> clearError(districtCombo, districtErrorLabel));
+
+        idIssueDatePicker.valueProperty().addListener((obs, old, newValue) -> clearError(idIssueDatePicker, idIssueDateErrorLabel));
+        idIssuePlaceCombo.valueProperty().addListener((obs, old, newValue) -> clearError(idIssuePlaceCombo, idIssuePlaceErrorLabel));
+        bankAccountNameField.textProperty().addListener((obs, old, newValue) -> clearError(bankAccountNameField, bankAccountNameErrorLabel));
+        bankAccountNumberField.textProperty().addListener((obs, old, newValue) -> clearError(bankAccountNumberField, bankAccountNumberErrorLabel));
+        bankNameCombo.valueProperty().addListener((obs, old, newValue) -> clearError(bankNameCombo, bankNameErrorLabel));
     }
 }

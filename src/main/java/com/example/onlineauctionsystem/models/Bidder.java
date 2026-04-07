@@ -25,9 +25,4 @@ public class Bidder extends User {
     public void printInfo() {
         System.out.println("[BIDDER] ID: " + this.id + " | User: " + this.username + " | Balance: $" + this.walletBalance);
     }
-
-    @Override
-    public String toCSV() {
-        return super.toCSV() + "," + walletBalance;
-    }
 }

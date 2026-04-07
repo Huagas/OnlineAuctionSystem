@@ -24,9 +24,4 @@ public class Seller extends User {
     public void printInfo() {
         System.out.println("[SELLER] ID: " + this.id + " | User: " + this.username + " | ReputationScore: *" + this.reputationScore);
     }
-
-    @Override
-    public String toCSV() {
-        return super.toCSV() + "," + reputationScore;
-    }
 }

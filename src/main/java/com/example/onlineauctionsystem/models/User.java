@@ -1,24 +1,23 @@
 package com.example.onlineauctionsystem.models;
 
-import javafx.fxml.FXML;
-
-import java.time.LocalDateTime;
-
 public abstract class User extends Entity {
     protected String username;
     protected String password;
     protected String email;
     protected String phone;
 
-    protected String idNumber;
-    protected String taxCode;
-    protected String address;
-
-    protected String province;
-    protected String district;
-
+    protected String idNumber = "";
+    protected String taxCode = "";
+    protected String address = "";
+    protected String province = "";
+    protected String district = "";
+    protected String idIssueDate = "";
+    protected String idIssuePlace = "";
     protected String frontIdPath = "";
     protected String backIdPath = "";
+    protected String bankAccountName = "";
+    protected String bankAccountNumber = "";
+    protected String bankName = "";
 
     protected boolean profileComplete = false;
 
@@ -28,28 +27,6 @@ public abstract class User extends Entity {
         this.password = password;
         this.email = email;
         this.phone = phone;
-
-        idNumber = "";
-        taxCode = "";
-        address = "";
-        province = "";
-        district = "";
-    }
-
-    public User(String id, LocalDateTime createdAt, String username, String password, String email, String phone, String idNumber, String taxCode,
-                String address, String province, String district, boolean profileComplete) {
-        super(id, createdAt);
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-
-        this.idNumber = idNumber;
-        this.taxCode = taxCode;
-        this.address = address;
-        this.province = province;
-        this.district = district;
-        this.profileComplete = profileComplete;
     }
 
     public boolean isProfileComplete() {
@@ -78,6 +55,13 @@ public abstract class User extends Entity {
     public String getProvince() { return province; }
     public String getDistrict() { return district; }
 
+    public String getIdIssueDate() { return idIssueDate; }
+    public String getIdIssuePlace() { return idIssuePlace; }
+
+    public String getBankAccountName() { return bankAccountName; }
+    public String getBankAccountNumber() { return bankAccountNumber; }
+    public String getBankName() { return bankName; }
+
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setEmail(String email) { this.email = email; }
@@ -90,26 +74,12 @@ public abstract class User extends Entity {
     public void setProvince(String province) { this.province = province; }
     public void setDistrict(String district) { this.district = district; }
 
+    public void setIdIssueDate(String idIssueDate) { this.idIssueDate = idIssueDate; }
+    public void setIdIssuePlace(String idIssuePlace) { this.idIssuePlace = idIssuePlace; }
+    public void setBankAccountName(String bankAccountName) { this.bankAccountName = bankAccountName; }
+    public void setBankAccountNumber(String bankAccountNumber) { this.bankAccountNumber = bankAccountNumber; }
+    public void setBankName(String bankName) { this.bankName = bankName; }
+
     public abstract String getRole();
     public abstract void printInfo();
-
-    public String toCSV() {
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%b,%s,%s",
-                getRole(),
-                getId(),
-                getCreatedAt(),
-                username,
-                password,
-                email,
-                phone,
-                idNumber,
-                taxCode,
-                address,
-                province,
-                district,
-                profileComplete,
-                frontIdPath,
-                backIdPath
-        );
-    }
 }
