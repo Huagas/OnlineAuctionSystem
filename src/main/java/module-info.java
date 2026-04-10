@@ -8,4 +8,6 @@ module com.example.onlineauctionsystem {
     exports com.example.onlineauctionsystem.controllers;
     opens com.example.onlineauctionsystem.controllers to javafx.fxml;
     opens com.example.onlineauctionsystem.models to javafx.base;
+    exports com.example.onlineauctionsystem.services;
+    opens com.example.onlineauctionsystem.services to javafx.fxml;
 }

@@ -127,7 +127,7 @@ public class AddItemController {
                 if (editingItem != null) {
                     newItem.setId(editingItem.getId());
                     newItem.setCurrentHighestBid(editingItem.getCurrentHighestBid());
-                    ItemService.updateItemFull(newItem);
+                    ItemService.updateItemDetails(newItem);
                 } else {
                     ItemService.addItem(newItem);
                 }

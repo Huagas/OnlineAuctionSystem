@@ -17,6 +17,7 @@
     -fx-border-width: 2;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
+    -fx-cursor: hand;
 }
 
 .menu-item-active {

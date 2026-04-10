@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.regex.Pattern;
 
 public class ProfileController {
     @FXML private TextField usernameField;

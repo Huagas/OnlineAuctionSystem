@@ -3,6 +3,7 @@ package com.example.onlineauctionsystem.controllers;
 import com.example.onlineauctionsystem.models.Bidder;
 import com.example.onlineauctionsystem.models.Item;
 import com.example.onlineauctionsystem.models.User;
+import com.example.onlineauctionsystem.services.AuctionRegistrationService;
 import com.example.onlineauctionsystem.services.ItemService;
 import com.example.onlineauctionsystem.utils.AuctionObserver;
 import javafx.animation.Animation;
@@ -15,11 +16,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -129,9 +128,25 @@ public class BidderDashboardController implements AuctionObserver {
         lblStatusValue.setId("status-" + item.getId());
         updateStatusStyle(lblStatusValue, item.getStatus());
 
-        infoBox.getChildren().addAll(nameLabel, new Region(), priceBox, depositBox, timeBox, statusBox);
-        card.getChildren().addAll(imageBox, infoBox);
+        Button btnRegister = new Button("Đăng ký đấu giá");
+        btnRegister.getStyleClass().add("register-btn");
+        btnRegister.setMaxWidth(Double.MAX_VALUE);
+        VBox.setMargin(btnRegister, new Insets(10, 0, 0, 0));
+        if (AuctionRegistrationService.isUserRegistered(currentUser.getId(), item.getId())) {
+            btnRegister.setText("Chờ đấu giá");
+            btnRegister.setDisable(true);
+        }
+        btnRegister.setOnAction(event -> {
+            event.consume();
+            boolean success = AuctionRegistrationService.registerUserForItem(currentUser.getId(), item.getId(), 5000);
+            if (success) {
+                btnRegister.setText("Chờ đấu giá");
+                btnRegister.setDisable(true);
+            }
+        });
 
+        infoBox.getChildren().addAll(nameLabel, new Region(), priceBox, depositBox, timeBox, statusBox, btnRegister);
+        card.getChildren().addAll(imageBox, infoBox);
         card.setOnMouseClicked(event -> openItemDetails(item));
         return card;
     }

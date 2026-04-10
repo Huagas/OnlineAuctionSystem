@@ -40,16 +40,17 @@ public class LoginController {
             System.out.println("Đăng nhập thành công: " + username + " | Vai trò: " + role);
 
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/onlineauctionsystem/views/profile-view.fxml"));
+                /*
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/onlineauctionsystem/views/user-portal.fxml"));
                 Parent root = loader.load();
-                ProfileController profileController = loader.getController();
-                profileController.initData(loggedInUser);
+                UserPortalController userPortalController = loader.getController();
+                userPortalController.initData(loggedInUser);
 
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.centerOnScreen();
                 stage.show();
-                /*
+                */
                 Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                 FXMLLoader loader;
                 Scene scene;
@@ -86,7 +87,7 @@ public class LoginController {
 
                 stage.setScene(scene);
                 stage.centerOnScreen();
-                 */
+
             } catch (Exception e) {
                 e.printStackTrace();
                 showAlert(Alert.AlertType.ERROR, "Lỗi hệ thống", "Không thể tải màn hình tiếp theo: " + e.getMessage());
